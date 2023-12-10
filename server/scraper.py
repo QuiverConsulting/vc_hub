@@ -36,7 +36,7 @@ def parse(html_data):
 
 
 def insert_db():
-    pass;
+    pass
 
 
 if __name__ == '__main__':
