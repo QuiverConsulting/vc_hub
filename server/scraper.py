@@ -1,7 +1,7 @@
+import os
 import requests
 import logging
 from bs4 import BeautifulSoup
-
 logging.basicConfig(level=logging.INFO)
 
 sites = {
@@ -17,9 +17,12 @@ sites = {
 
 
 def scrape():
+    if not os.path.exists('htmlFiles'):
+        os.makedirs('htmlFiles')
     for site in sites:
         logging.info(f'Scraping {sites[site]}...')
         page = requests.get(sites[site], headers={'User-Agent': 'VC_HUB'})
+
         with open(f"htmlFiles/html_{site}.txt", 'w', encoding="utf-8") as html_file:
             html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
