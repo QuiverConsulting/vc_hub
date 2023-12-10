@@ -4,7 +4,6 @@
 /dist
 /tmp
 /out-tsc
-/htmlFiles
 
 # dependencies
 /node_modules
@@ -44,3 +43,6 @@ testem.log
 .DS_Store
 Thumbs.db
 server/.env
+
+# System Dirs
+server/htmlFiles/
