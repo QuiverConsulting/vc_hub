@@ -2,17 +2,20 @@ import os
 import requests
 import logging
 from bs4 import BeautifulSoup
+import re
+from bs4.element import Comment
+
 logging.basicConfig(level=logging.INFO)
 
 sites = {
-    'geekwire': 'https://www.geekwire.com/fundings/',
-    'teachcrunch_startups': 'https://techcrunch.com/category/startups/',
+#     'geekwire': 'https://www.geekwire.com/fundings/',
+#     'teachcrunch_startups': 'https://techcrunch.com/category/startups/',
     'techcrunch_venture': 'https://techcrunch.com/category/venture/',
-    'crunchbase': 'https://news.crunchbase.com/',
-    'crunchbase_seed': 'https://news.crunchbase.com/sections/seed/',
-    'eustartups': 'https://www.eu-startups.com/category/fundin/',
-    'sifted': 'https://sifted.eu/sector/venture-capital',
-    'finsmes': 'https://www.finsmes.com/'
+#     'crunchbase': 'https://news.crunchbase.com/',
+#     'crunchbase_seed': 'https://news.crunchbase.com/sections/seed/',
+#     'eustartups': 'https://www.eu-startups.com/category/fundin/',
+#     'sifted': 'https://sifted.eu/sector/venture-capital',
+#     'finsmes': 'https://www.finsmes.com/'
 }
 
 
@@ -32,7 +35,11 @@ def scrape():
 def parse(html_data):
     # there are different parsers that we can use besides html.parser
     parsed_data = BeautifulSoup(html_data, "html.parser")
-    # print(parsed_data.prettify())
+
+    test = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
+    for entry in test:
+        print(" ".join(entry.text.split()))
+
 
 
 def insert_db():
