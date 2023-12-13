@@ -23,8 +23,8 @@ sites = {
 #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
 #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
 #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-#        SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
-        SITES.FINSMES: 'https://www.finsmes.com/'
+       SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+#         SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -45,15 +45,41 @@ def parse(html_data, site):
     # there are different parsers that we can use besides html.parser
     parsed_data = BeautifulSoup(html_data, "html.parser")
     match site.value:
+        case SITES.TECHRUNCH_STARTUPS.value:
+            articles = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
+            for article in articles:
+                print(" ".join(article.text.split()))
+                print('\n')
         case SITES.TECHCRUNCH_VENTURE.value:
-            test = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
-            for entry in test:
-                print(" ".join(entry.text.split()))
+            articles = parsed_data.find_all("div", class_="post-block post-block--image post-block--unread")
+            for article in articles:
+                print(" ".join(article.text.split()))
+                print('\n')
+        case SITES.CRUNCHBASE.value:
+            articles = parsed_data.find_all("article", class_=["herald-lay-b","herald-lay-f"])
+            for article in articles:
+                print(" ".join(article.text.split()))
+                print('\n')
+        case SITES.CRUNCHBASE_SEED.value:
+            articles = parsed_data.find_all("article", class_=["herald-lay-a","herald-lay-c","herald-lay-f"])
+            for article in articles:
+                print(" ".join(article.text.split()))
+                print('\n')
+        case SITES.EUSTARTUPS.value:
+            # TODO: handle duplicate articles
+            articles = parsed_data.find_all("div", class_="td-animation-stack")
+            for article in articles:
+                print(" ".join(article.text.split()))
+                print('\n')
+        case SITES.SIFTED.value:
+            articles = parsed_data.find_all("li", class_="m-0")
+            for article in articles:
+                print(" ".join(article.text.split()))
                 print('\n')
         case SITES.FINSMES.value:
-            test = parsed_data.find_all("article")
-            for entry in test:
-                print(entry.getText(separator=" ", strip=True))
+            articles = parsed_data.find_all("article")
+            for article in articles:
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
 
 
