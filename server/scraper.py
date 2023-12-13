@@ -3,9 +3,16 @@ import requests
 import logging
 from bs4 import BeautifulSoup
 from enum import Enum
+from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
+load_dotenv()
 
+API_TOKEN = os.getenv('API_TOKEN')
+DB_PASS = os.getenv('DB_PASS')
+DB_USER = os.getenv('DB_USER')
+
+currency = ["$", "€", "£", "¥"]
 class SITES(Enum):
     GEEKWIRE = 'geekwire'
     TECHRUNCH_STARTUPS = 'teachcrunch_startups'
@@ -48,34 +55,39 @@ def parse(html_data, site):
         case SITES.TECHRUNCH_STARTUPS.value:
             articles = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
             for article in articles:
-                print(" ".join(article.text.split()))
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.TECHCRUNCH_VENTURE.value:
             articles = parsed_data.find_all("div", class_="post-block post-block--image post-block--unread")
             for article in articles:
-                print(" ".join(article.text.split()))
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.CRUNCHBASE.value:
             articles = parsed_data.find_all("article", class_=["herald-lay-b","herald-lay-f"])
             for article in articles:
-                print(" ".join(article.text.split()))
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.CRUNCHBASE_SEED.value:
             articles = parsed_data.find_all("article", class_=["herald-lay-a","herald-lay-c","herald-lay-f"])
             for article in articles:
-                print(" ".join(article.text.split()))
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.EUSTARTUPS.value:
             # TODO: handle duplicate articles
             articles = parsed_data.find_all("div", class_="td-animation-stack")
             for article in articles:
-                print(" ".join(article.text.split()))
+                print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.SIFTED.value:
             articles = parsed_data.find_all("li", class_="m-0")
             for article in articles:
-                print(" ".join(article.text.split()))
-                print('\n')
+                # print(article.getText(separator=" ", strip=True))
+                # print('\n')
+                content = article.getText(separator=" ", strip=True)
+                for character in content:
+                    if character in currency:
+                        tokenize(content)
+                        break
         case SITES.FINSMES.value:
             articles = parsed_data.find_all("article")
             for article in articles:
@@ -83,10 +95,18 @@ def parse(html_data, site):
                 print('\n')
 
 
+def tokenize(article):
+    API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    def query(payload):
+        response = requests.post(API_URL, headers=headers, json=payload)
+        return response.json()
 
+    data = query(article)
+    print(data)
 def insert_db():
     pass
 
-
 if __name__ == '__main__':
     scrape()
+
