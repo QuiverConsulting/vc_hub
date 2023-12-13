@@ -2,20 +2,29 @@ import os
 import requests
 import logging
 from bs4 import BeautifulSoup
-import re
-from bs4.element import Comment
+from enum import Enum
 
 logging.basicConfig(level=logging.INFO)
 
+class SITES(Enum):
+    GEEKWIRE = 'geekwire'
+    TECHRUNCH_STARTUPS = 'teachcrunch_startups'
+    TECHCRUNCH_VENTURE = 'techcrunch_venture'
+    CRUNCHBASE = 'crunchbase'
+    CRUNCHBASE_SEED = 'crunchbase_seed'
+    EUSTARTUPS = 'eustartups'
+    SIFTED = 'sifted'
+    FINSMES = 'finsmes'
+
 sites = {
-#     'geekwire': 'https://www.geekwire.com/fundings/',
-#     'teachcrunch_startups': 'https://techcrunch.com/category/startups/',
-    'techcrunch_venture': 'https://techcrunch.com/category/venture/',
-#     'crunchbase': 'https://news.crunchbase.com/',
-#     'crunchbase_seed': 'https://news.crunchbase.com/sections/seed/',
-#     'eustartups': 'https://www.eu-startups.com/category/fundin/',
-#     'sifted': 'https://sifted.eu/sector/venture-capital',
-#     'finsmes': 'https://www.finsmes.com/'
+#        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
+#        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+#        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
+#        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
+#        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
+#        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
+#        SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+        SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -29,16 +38,23 @@ def scrape():
         with open(f"htmlFiles/html_{site}.txt", 'w', encoding="utf-8") as html_file:
             html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
-        parse(page.text)
+        parse(page.text, site)
 
 
-def parse(html_data):
+def parse(html_data, site):
     # there are different parsers that we can use besides html.parser
     parsed_data = BeautifulSoup(html_data, "html.parser")
-
-    test = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
-    for entry in test:
-        print(" ".join(entry.text.split()))
+    match site:
+        case SITES.TECHCRUNCH_VENTURE:
+            test = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
+            for entry in test:
+                print(" ".join(entry.text.split()))
+                print('\n')
+        case SITES.FINSMES:
+            test = parsed_data.find_all("article")
+            for entry in test:
+                print(entry.getText(separator=" ", strip=True))
+                print('\n')
 
 
 
