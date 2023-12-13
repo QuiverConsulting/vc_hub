@@ -35,7 +35,7 @@ def scrape():
         logging.info(f'Scraping {sites[site]}...')
         page = requests.get(sites[site], headers={'User-Agent': 'VC_HUB'})
 
-        with open(f"htmlFiles/html_{site}.txt", 'w', encoding="utf-8") as html_file:
+        with open(f"htmlFiles/html_{site.value}.txt", 'w', encoding="utf-8") as html_file:
             html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
         parse(page.text, site)
@@ -44,13 +44,13 @@ def scrape():
 def parse(html_data, site):
     # there are different parsers that we can use besides html.parser
     parsed_data = BeautifulSoup(html_data, "html.parser")
-    match site:
-        case SITES.TECHCRUNCH_VENTURE:
+    match site.value:
+        case SITES.TECHCRUNCH_VENTURE.value:
             test = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
             for entry in test:
                 print(" ".join(entry.text.split()))
                 print('\n')
-        case SITES.FINSMES:
+        case SITES.FINSMES.value:
             test = parsed_data.find_all("article")
             for entry in test:
                 print(entry.getText(separator=" ", strip=True))
