@@ -25,12 +25,12 @@ class SITES(Enum):
 
 sites = {
 #        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
-#        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
 #        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
 #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
 #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
 #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-       SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+#      SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
 #         SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
@@ -55,6 +55,8 @@ def parse(html_data, site):
         case SITES.TECHRUNCH_STARTUPS.value:
             articles = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
             for article in articles:
+                date = article.findNext("time")
+                print(date['datetime'])
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.TECHCRUNCH_VENTURE.value:
@@ -91,6 +93,8 @@ def parse(html_data, site):
         case SITES.FINSMES.value:
             articles = parsed_data.find_all("article")
             for article in articles:
+                date = article.findNext("time")
+                print(date['datetime'])
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
 
