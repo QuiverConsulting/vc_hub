@@ -25,13 +25,13 @@ class SITES(Enum):
 
 sites = {
 #        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
-        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+#        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
 #        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
 #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
 #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
 #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-#      SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
-#         SITES.FINSMES: 'https://www.finsmes.com/'
+        SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+#        SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -62,29 +62,39 @@ def parse(html_data, site):
         case SITES.TECHCRUNCH_VENTURE.value:
             articles = parsed_data.find_all("div", class_="post-block post-block--image post-block--unread")
             for article in articles:
+                date = article.findNext("time")
+                print(date['datetime'])
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.CRUNCHBASE.value:
             articles = parsed_data.find_all("article", class_=["herald-lay-b","herald-lay-f"])
             for article in articles:
+                date = article.findNext(class_="updated")
+                print(date.text)
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.CRUNCHBASE_SEED.value:
             articles = parsed_data.find_all("article", class_=["herald-lay-a","herald-lay-c","herald-lay-f"])
             for article in articles:
+                date = article.findNext(class_="updated")
+                print(date.text)
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.EUSTARTUPS.value:
             # TODO: handle duplicate articles
             articles = parsed_data.find_all("div", class_="td-animation-stack")
             for article in articles:
+                date = article.findNext("time")
+                print(date['datetime'])
                 print(article.getText(separator=" ", strip=True))
                 print('\n')
         case SITES.SIFTED.value:
             articles = parsed_data.find_all("li", class_="m-0")
             for article in articles:
-                # print(article.getText(separator=" ", strip=True))
-                # print('\n')
+                #date = article.findNext(class_="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
+                #print(date.text)
+                #print(article.getText(separator=" ", strip=True))
+                #print('\n')
                 content = article.getText(separator=" ", strip=True)
                 for character in content:
                     if character in currency:
