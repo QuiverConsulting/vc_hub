@@ -48,65 +48,57 @@ def scrape():
         parse(page.text, site)
 
 
+def parse_date_and_article(data, article_tag, article_class=None, date_tag=None, date_class=None):
+    articles = []
+    if article_class!=None:
+        articles_parsed = data.find_all(article_tag, class_= article_class)
+    else:
+        articles_parsed = data.find_all(article_tag)
+    for article in articles_parsed:
+        if date_class!=None and date_tag!= None:
+            date_parse = article.findNext(date_tag, class_= date_class)
+        elif date_class==None and date_tag!= None:
+            date_parse = article.findNext(date_tag)
+        else: date_parse = article.findNext(class_= date_class)
+        if date_tag == 'time':
+            date = date_parse['datetime']
+        else: date = date_parse.text
+        articles.append({'date': date, 'article': article.getText(separator=" ", strip=True)})
+    return articles
+
+
 def parse(html_data, site):
     # there are different parsers that we can use besides html.parser
     parsed_data = BeautifulSoup(html_data, "html.parser")
     match site.value:
         case SITES.TECHRUNCH_STARTUPS.value:
-            articles = parsed_data.find_all("div", class_ ="post-block post-block--image post-block--unread")
-            for article in articles:
-                date = article.findNext("time")
-                print(date['datetime'])
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, "div", "post-block post-block--image post-block--unread", "time")
+            print(articles)
         case SITES.TECHCRUNCH_VENTURE.value:
-            articles = parsed_data.find_all("div", class_="post-block post-block--image post-block--unread")
-            for article in articles:
-                date = article.findNext("time")
-                print(date['datetime'])
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, "div", "post-block post-block--image post-block--unread", "time")
+            print(articles)
         case SITES.CRUNCHBASE.value:
-            articles = parsed_data.find_all("article", class_=["herald-lay-b","herald-lay-f"])
-            for article in articles:
-                date = article.findNext(class_="updated")
-                print(date.text)
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, "article", ["herald-lay-b","herald-lay-f"], date_class="updated")
+            print(articles)
         case SITES.CRUNCHBASE_SEED.value:
-            articles = parsed_data.find_all("article", class_=["herald-lay-a","herald-lay-c","herald-lay-f"])
-            for article in articles:
-                date = article.findNext(class_="updated")
-                print(date.text)
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, "article", ["herald-lay-a","herald-lay-c","herald-lay-f"], date_class="updated")
+            print(articles)
         case SITES.EUSTARTUPS.value:
             # TODO: handle duplicate articles
-            articles = parsed_data.find_all("div", class_="td-animation-stack")
-            for article in articles:
-                date = article.findNext("time")
-                print(date['datetime'])
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, "div", "td-animation-stack", "time")
+            print(articles)
         case SITES.SIFTED.value:
-            articles = parsed_data.find_all("li", class_="m-0")
+            articles = parse_date_and_article(parsed_data, "li", "m-0", date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
+            # print(articles)
             for article in articles:
-                #date = article.findNext(class_="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
-                #print(date.text)
-                #print(article.getText(separator=" ", strip=True))
-                #print('\n')
-                content = article.getText(separator=" ", strip=True)
+                content = article['article']
                 for character in content:
-                    if character in currency:
-                        tokenize(content)
-                        break
+                   if character in currency:
+                       tokenize(content)
+                       break
         case SITES.FINSMES.value:
-            articles = parsed_data.find_all("article")
-            for article in articles:
-                date = article.findNext("time")
-                print(date['datetime'])
-                print(article.getText(separator=" ", strip=True))
-                print('\n')
+            articles = parse_date_and_article(parsed_data, article_tag="article", date_tag="time")
+            print(articles)
 
 
 def tokenize(article):
