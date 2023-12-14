@@ -48,16 +48,16 @@ def scrape():
         with open(f"htmlFiles/html_{site.value}.txt", 'w', encoding="utf-8") as html_file:
             html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
-        parse(page.text, site)
+        parse_html(page.text, site)
 
 
-def parse_article(data, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
+def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
     articles = []
     kwargs_article = dict(name=article_tag, class_=article_class)
     kwargs_date = dict(name=date_tag, class_=date_class)
     kwargs_link = dict(name='a', class_=link_class)
 
-    articles_parsed = data.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
+    articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
     for article in articles_parsed:
         date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
         if date_tag == 'time':
@@ -71,32 +71,32 @@ def parse_article(data, article_tag, article_class=None, date_tag=None, date_cla
     return articles
 
 
-def parse(html_data, site):
+def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
-    parsed_data = BeautifulSoup(html_data, "html.parser")
+    soup = BeautifulSoup(html_data, "html.parser")
     match site.value:
         case SITES.TECHRUNCH_STARTUPS.value:
-            articles = parse_article(parsed_data, "div", "post-block post-block--image post-block--unread",
+            articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                               "time")
             print(articles)
         case SITES.TECHCRUNCH_VENTURE.value:
-            articles = parse_article(parsed_data, "div", "post-block post-block--image post-block--unread",
+            articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                               "time")
             print(articles)
         case SITES.CRUNCHBASE.value:
-            articles = parse_article(parsed_data, "article", ["herald-lay-b", "herald-lay-f"],
+            articles = parse_articles(soup, "article", ["herald-lay-b", "herald-lay-f"],
                                               date_class="updated")
             print(articles)
         case SITES.CRUNCHBASE_SEED.value:
-            articles = parse_article(parsed_data, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
+            articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
                                               date_class="updated")
             print(articles)
         case SITES.EUSTARTUPS.value:
             # TODO: handle duplicate articles
-            articles = parse_article(parsed_data, "div", "td-animation-stack", "time")
+            articles = parse_articles(soup, "div", "td-animation-stack", "time")
             print(articles)
         case SITES.SIFTED.value:
-            articles = parse_article(parsed_data, "li", "m-0",
+            articles = parse_articles(soup, "li", "m-0",
                                               date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
             #print(articles)
             for article in articles:
@@ -106,7 +106,7 @@ def parse(html_data, site):
                         tokenize(content)
                         break
         case SITES.FINSMES.value:
-            articles = parse_article(parsed_data, article_tag="article", date_tag="time")
+            articles = parse_articles(soup, article_tag="article", date_tag="time")
             print(articles)
 
 
