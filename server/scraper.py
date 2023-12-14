@@ -6,6 +6,8 @@ from enum import Enum
 from dotenv import load_dotenv
 from pymongo.mongo_client import MongoClient
 from datetime import datetime
+from pydantic import BaseModel, Field
+from typing import Optional, List
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -16,6 +18,18 @@ DB_NAME = os.getenv('DB_NAME')
 DB_COLLECTION = os.getenv('DB_COLLECTION')
 
 currency = ["$", "€", "£", "¥"]
+
+
+class Article(BaseModel):
+    link: Optional[str]
+    date: Optional[str]
+    company_name: Optional[str]
+    series: Optional[str]
+    location: Optional[str]
+    funding_currency: Optional[str]
+    funding_amount: Optional[float]
+    financers: Optional[List[str]]
+    timestamp: datetime = Field(default_factory=datetime.now)
 
 
 class Sites(Enum):
@@ -36,7 +50,7 @@ sites = {
     #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
     #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
     #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-             Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
+    Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
     #        SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
@@ -80,19 +94,19 @@ def parse_html(html_data, site):
     match site.value:
         case Sites.TECHRUNCH_STARTUPS.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
-                                              "time")
+                                      "time")
             print(articles)
         case Sites.TECHCRUNCH_VENTURE.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
-                                              "time")
+                                      "time")
             print(articles)
         case Sites.CRUNCHBASE.value:
             articles = parse_articles(soup, "article", ["herald-lay-b", "herald-lay-f"],
-                                              date_class="updated")
+                                      date_class="updated")
             print(articles)
         case Sites.CRUNCHBASE_SEED.value:
             articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
-                                              date_class="updated")
+                                      date_class="updated")
             print(articles)
         case Sites.EUSTARTUPS.value:
             # TODO: handle duplicate articles
@@ -100,8 +114,8 @@ def parse_html(html_data, site):
             print(articles)
         case Sites.SIFTED.value:
             articles = parse_articles(soup, "li", "m-0",
-                                              date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
-            #print(articles)
+                                      date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
+            # print(articles)
             for article in articles:
                 content = article['article']
                 for character in content:
@@ -126,20 +140,23 @@ def tokenize(article):
 
 
 def insert_db(articles):
-    # Create a new client and connect to the server
     client = MongoClient(MONGO_CONNECTION_STR)
-    # Send a ping to confirm a successful connection
     try:
-        client.admin.command('ping')
         db = client[DB_NAME]
         collection = db[DB_COLLECTION]
         collection.insert_many(articles)
+        logging.info(f"Inserted {len(articles)} records into db.")
     except Exception as e:
-        logging.error("Error while inserting to db: ", e)
+        logging.error(f"Error while inserting to db: {e}\n articles: {articles}.")
 
 
 if __name__ == '__main__':
-    # scrape()
-    insert_db([{'article': 'test article', 'link': 'test link', 'date': 'test date', 'company_name': 'test company name', 'series': 'test series', 'location': 'test location',
-                'funding_amount': '10000',
-                'financers': ['financer1', 'financer2'], 'timestamp': datetime.now()}])
+    scrape()
+    a1 = Article(article='test article', link='test link', date='test date',
+                 company_name='test company name', series='test series', location='test location',
+                 funding_amount=10000, funding_currency='CAD', financers=['financer1', 'financer2'])
+
+    a2 = Article(article='test article2', link='test link2', date='test date2',
+                 company_name='test company name2', series=None, location='test location2',
+                 funding_amount=100002, funding_currency='CAD2', financers=['financer12', 'financer22'])
+    # insert_db([a1.model_dump(), a2.model_dump()])
