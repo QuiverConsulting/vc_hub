@@ -13,6 +13,8 @@ DB_PASS = os.getenv('DB_PASS')
 DB_USER = os.getenv('DB_USER')
 
 currency = ["$", "€", "£", "¥"]
+
+
 class SITES(Enum):
     GEEKWIRE = 'geekwire'
     TECHRUNCH_STARTUPS = 'teachcrunch_startups'
@@ -23,15 +25,16 @@ class SITES(Enum):
     SIFTED = 'sifted'
     FINSMES = 'finsmes'
 
+
 sites = {
-#        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
-#        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
-#        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
-#        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
-#        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
-#        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-        SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
-#        SITES.FINSMES: 'https://www.finsmes.com/'
+    #        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
+    #        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+    #        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
+    #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
+    #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
+    #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
+    SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+    #SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -48,22 +51,29 @@ def scrape():
         parse(page.text, site)
 
 
-def parse_date_and_article(data, article_tag, article_class=None, date_tag=None, date_class=None):
+def parse_article(data, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
     articles = []
-    if article_class!=None:
-        articles_parsed = data.find_all(article_tag, class_= article_class)
+    if article_class != None:
+        articles_parsed = data.find_all(article_tag, class_=article_class)
     else:
         articles_parsed = data.find_all(article_tag)
     for article in articles_parsed:
-        if date_class!=None and date_tag!= None:
-            date_parse = article.findNext(date_tag, class_= date_class)
-        elif date_class==None and date_tag!= None:
+        if date_class != None and date_tag != None:
+            date_parse = article.findNext(date_tag, class_=date_class)
+        elif date_class == None and date_tag != None:
             date_parse = article.findNext(date_tag)
-        else: date_parse = article.findNext(class_= date_class)
+        else:
+            date_parse = article.findNext(class_=date_class)
         if date_tag == 'time':
             date = date_parse['datetime']
-        else: date = date_parse.text
-        articles.append({'date': date, 'article': article.getText(separator=" ", strip=True)})
+        else:
+            date = date_parse.text
+        if link_class != None:
+            link_parsed = article.findNext('a', class_=link_class)
+        else:
+            link_parsed = article.findNext('a')
+        link = link_parsed['href']
+        articles.append({'date': date, 'article': article.getText(separator=" ", strip=True), 'link': link})
     return articles
 
 
@@ -72,47 +82,55 @@ def parse(html_data, site):
     parsed_data = BeautifulSoup(html_data, "html.parser")
     match site.value:
         case SITES.TECHRUNCH_STARTUPS.value:
-            articles = parse_date_and_article(parsed_data, "div", "post-block post-block--image post-block--unread", "time")
+            articles = parse_article(parsed_data, "div", "post-block post-block--image post-block--unread",
+                                              "time")
             print(articles)
         case SITES.TECHCRUNCH_VENTURE.value:
-            articles = parse_date_and_article(parsed_data, "div", "post-block post-block--image post-block--unread", "time")
+            articles = parse_article(parsed_data, "div", "post-block post-block--image post-block--unread",
+                                              "time")
             print(articles)
         case SITES.CRUNCHBASE.value:
-            articles = parse_date_and_article(parsed_data, "article", ["herald-lay-b","herald-lay-f"], date_class="updated")
+            articles = parse_article(parsed_data, "article", ["herald-lay-b", "herald-lay-f"],
+                                              date_class="updated")
             print(articles)
         case SITES.CRUNCHBASE_SEED.value:
-            articles = parse_date_and_article(parsed_data, "article", ["herald-lay-a","herald-lay-c","herald-lay-f"], date_class="updated")
+            articles = parse_article(parsed_data, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
+                                              date_class="updated")
             print(articles)
         case SITES.EUSTARTUPS.value:
             # TODO: handle duplicate articles
-            articles = parse_date_and_article(parsed_data, "div", "td-animation-stack", "time")
+            articles = parse_article(parsed_data, "div", "td-animation-stack", "time")
             print(articles)
         case SITES.SIFTED.value:
-            articles = parse_date_and_article(parsed_data, "li", "m-0", date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
-            # print(articles)
+            articles = parse_article(parsed_data, "li", "m-0",
+                                              date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
+            #print(articles)
             for article in articles:
                 content = article['article']
                 for character in content:
-                   if character in currency:
-                       tokenize(content)
-                       break
+                    if character in currency:
+                        tokenize(content)
+                        break
         case SITES.FINSMES.value:
-            articles = parse_date_and_article(parsed_data, article_tag="article", date_tag="time")
+            articles = parse_article(parsed_data, article_tag="article", date_tag="time")
             print(articles)
 
 
 def tokenize(article):
     API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
     def query(payload):
         response = requests.post(API_URL, headers=headers, json=payload)
         return response.json()
 
     data = query(article)
     print(data)
+
+
 def insert_db():
     pass
 
+
 if __name__ == '__main__':
     scrape()
-
