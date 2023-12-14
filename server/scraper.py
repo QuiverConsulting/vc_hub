@@ -33,8 +33,8 @@ sites = {
     #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
     #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
     #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-    SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
-    #SITES.FINSMES: 'https://www.finsmes.com/'
+             SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+    #        SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -53,25 +53,19 @@ def scrape():
 
 def parse_article(data, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
     articles = []
-    if article_class != None:
-        articles_parsed = data.find_all(article_tag, class_=article_class)
-    else:
-        articles_parsed = data.find_all(article_tag)
+    kwargs_article = dict(name=article_tag, class_=article_class)
+    kwargs_date = dict(name=date_tag, class_=date_class)
+    kwargs_link = dict(name='a', class_=link_class)
+
+    articles_parsed = data.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
     for article in articles_parsed:
-        if date_class != None and date_tag != None:
-            date_parse = article.findNext(date_tag, class_=date_class)
-        elif date_class == None and date_tag != None:
-            date_parse = article.findNext(date_tag)
-        else:
-            date_parse = article.findNext(class_=date_class)
+        date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
         if date_tag == 'time':
             date = date_parse['datetime']
         else:
             date = date_parse.text
-        if link_class != None:
-            link_parsed = article.findNext('a', class_=link_class)
-        else:
-            link_parsed = article.findNext('a')
+
+        link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
         link = link_parsed['href']
         articles.append({'date': date, 'article': article.getText(separator=" ", strip=True), 'link': link})
     return articles
