@@ -21,14 +21,13 @@ currency = ["$", "€", "£", "¥"]
 
 
 class Article(BaseModel):
-    link: Optional[str]
-    date: Optional[str]
     company_name: Optional[str]
-    series: Optional[str]
+    funding: Optional[str]
     location: Optional[str]
-    funding_currency: Optional[str]
-    funding_amount: Optional[float]
+    series: Optional[str]
     financers: Optional[List[str]]
+    date: Optional[str]
+    link: Optional[str]
     timestamp: datetime = Field(default_factory=datetime.now)
 
 
@@ -154,9 +153,9 @@ if __name__ == '__main__':
     scrape()
     a1 = Article(article='test article', link='test link', date='test date',
                  company_name='test company name', series='test series', location='test location',
-                 funding_amount=10000, funding_currency='CAD', financers=['financer1', 'financer2'])
+                 funding='$10000', financers=['financer1', 'financer2'])
 
     a2 = Article(article='test article2', link='test link2', date='test date2',
                  company_name='test company name2', series=None, location='test location2',
-                 funding_amount=100002, funding_currency='CAD2', financers=['financer12', 'financer22'])
+                 funding='$100002', financers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
