@@ -4,18 +4,21 @@ import logging
 from bs4 import BeautifulSoup
 from enum import Enum
 from dotenv import load_dotenv
+from pymongo.mongo_client import MongoClient
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 API_TOKEN = os.getenv('API_TOKEN')
-DB_PASS = os.getenv('DB_PASS')
-DB_USER = os.getenv('DB_USER')
+MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
+DB_NAME = os.getenv('DB_NAME')
+DB_COLLECTION = os.getenv('DB_COLLECTION')
 
 currency = ["$", "€", "£", "¥"]
 
 
-class SITES(Enum):
+class Sites(Enum):
     GEEKWIRE = 'geekwire'
     TECHRUNCH_STARTUPS = 'teachcrunch_startups'
     TECHCRUNCH_VENTURE = 'techcrunch_venture'
@@ -33,7 +36,7 @@ sites = {
     #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
     #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
     #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-             SITES.SIFTED: 'https://sifted.eu/sector/venture-capital',
+             Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
     #        SITES.FINSMES: 'https://www.finsmes.com/'
 }
 
@@ -75,27 +78,27 @@ def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
     soup = BeautifulSoup(html_data, "html.parser")
     match site.value:
-        case SITES.TECHRUNCH_STARTUPS.value:
+        case Sites.TECHRUNCH_STARTUPS.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                               "time")
             print(articles)
-        case SITES.TECHCRUNCH_VENTURE.value:
+        case Sites.TECHCRUNCH_VENTURE.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                               "time")
             print(articles)
-        case SITES.CRUNCHBASE.value:
+        case Sites.CRUNCHBASE.value:
             articles = parse_articles(soup, "article", ["herald-lay-b", "herald-lay-f"],
                                               date_class="updated")
             print(articles)
-        case SITES.CRUNCHBASE_SEED.value:
+        case Sites.CRUNCHBASE_SEED.value:
             articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
                                               date_class="updated")
             print(articles)
-        case SITES.EUSTARTUPS.value:
+        case Sites.EUSTARTUPS.value:
             # TODO: handle duplicate articles
             articles = parse_articles(soup, "div", "td-animation-stack", "time")
             print(articles)
-        case SITES.SIFTED.value:
+        case Sites.SIFTED.value:
             articles = parse_articles(soup, "li", "m-0",
                                               date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
             #print(articles)
@@ -105,7 +108,7 @@ def parse_html(html_data, site):
                     if character in currency:
                         tokenize(content)
                         break
-        case SITES.FINSMES.value:
+        case Sites.FINSMES.value:
             articles = parse_articles(soup, article_tag="article", date_tag="time")
             print(articles)
 
@@ -122,9 +125,21 @@ def tokenize(article):
     print(data)
 
 
-def insert_db():
-    pass
+def insert_db(articles):
+    # Create a new client and connect to the server
+    client = MongoClient(MONGO_CONNECTION_STR)
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        db = client[DB_NAME]
+        collection = db[DB_COLLECTION]
+        collection.insert_many(articles)
+    except Exception as e:
+        logging.error("Error while inserting to db: ", e)
 
 
 if __name__ == '__main__':
-    scrape()
+    # scrape()
+    insert_db([{'article': 'test article', 'link': 'test link', 'date': 'test date', 'company_name': 'test company name', 'series': 'test series', 'location': 'test location',
+                'funding_amount': '10000',
+                'financers': ['financer1', 'financer2'], 'timestamp': datetime.now()}])
