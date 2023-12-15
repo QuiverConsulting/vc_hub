@@ -25,7 +25,7 @@ class Article(BaseModel):
     funding: Optional[str]
     location: Optional[str]
     series: Optional[str]
-    financers: Optional[List[str]]
+    financiers: Optional[List[str]]
     date: Optional[str]
     link: Optional[str]
     timestamp: datetime = Field(default_factory=datetime.now)
@@ -75,15 +75,30 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
 
     articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
     for article in articles_parsed:
-        date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
-        if date_tag == 'time':
-            date = date_parse['datetime']
-        else:
-            date = date_parse.text
+        for character in article.text:
+            if character in currency:  # Only parse articles that have currency in content
+                data = tokenize(article.text)  # Run article text through NER model
+                company_name = parse_orgs(data)  # Get company name
+                location = parse_location(data)  # Get location
+                financiers = parse_financiers(data)
 
-        link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
-        link = link_parsed['href']
-        articles.append({'date': date, 'article': article.getText(separator=" ", strip=True), 'link': link})
+                date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
+                if date_tag == 'time':
+                    date = date_parse['datetime']
+                else:
+                    date = date_parse.text
+
+                link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
+                link = link_parsed['href']
+                articles.append(Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
+                 company_name=company_name, series='test series', location=location,
+                 funding='$10000', financiers=financiers))
+
+                # articles.append({'date': date, 'article': article.getText(separator=" ", strip=True), 'link': link})
+                break
+
+    for test in articles:
+        print(test)
     return articles
 
 
@@ -115,16 +130,11 @@ def parse_html(html_data, site):
             articles = parse_articles(soup, "li", "m-0",
                                       date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
             # print(articles)
-            for article in articles:
-                content = article['article']
-                for character in content:
-                    if character in currency:
-                        tokenize(content)
-                        break
+
         case Sites.FINSMES.value:
             articles = parse_articles(soup, article_tag="article", date_tag="time")
             print(articles)
-
+ #TODO: create list of Article objects, populate each object and call to add to db
 
 def tokenize(article):
     API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
@@ -135,8 +145,56 @@ def tokenize(article):
         return response.json()
 
     data = query(article)
-    print(data)
 
+    return data
+
+def parse_orgs(data):
+
+    orgs = []
+    for entry in data:
+        if entry['entity_group'] == 'ORG' and not isVC(entry['word']):
+            orgs.append(entry['word'])
+
+    if len(orgs) == 0:
+        return None
+
+    return orgs[0]   #TODO: Figure out how to handle multiple orgs that aren't investors
+
+
+def isVC(organization):
+
+    #query list of known VCs on startup and check in there
+    keywords = ['VC', 'Capital', 'Venture', 'Partner']
+
+    for word in keywords:
+        if word in organization:
+            return True
+
+    return False
+
+def parse_financiers(data):
+
+    financiers = []
+    for entry in data:
+        if entry['entity_group'] == 'ORG' and isVC(entry):
+            financiers.append(entry['word'])
+
+    if len(financiers) == 0:
+        return None
+
+    return financiers
+def parse_location(data):
+    locations = []
+    for entry in data:
+        if entry['entity_group'] == 'LOC':
+            locations.append(entry['word'])
+
+    if len(locations) == 0:
+        return None
+
+    return locations[0]
+
+# def parse_funding(article):
 
 def insert_db(articles):
     client = MongoClient(MONGO_CONNECTION_STR)
@@ -153,9 +211,9 @@ if __name__ == '__main__':
     scrape()
     a1 = Article(article='test article', link='test link', date='test date',
                  company_name='test company name', series='test series', location='test location',
-                 funding='$10000', financers=['financer1', 'financer2'])
+                 funding='$10000', financiers=['financer1', 'financer2'])
 
     a2 = Article(article='test article2', link='test link2', date='test date2',
                  company_name='test company name2', series=None, location='test location2',
-                 funding='$100002', financers=['financer12', 'financer22'])
+                 funding='$100002', financiers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
