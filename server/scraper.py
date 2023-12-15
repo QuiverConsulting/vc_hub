@@ -80,7 +80,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 data = tokenize(article.text)  # Run article text through NER model
                 company_name = parse_orgs(data)  # Get company name
                 location = parse_location(data)  # Get location
-                financiers = parse_financiers(data)
+                financiers = parse_financiers(data)  #Get list of financiers
 
                 date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
                 if date_tag == 'time':
@@ -94,8 +94,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                  company_name=company_name, series='test series', location=location,
                  funding='$10000', financiers=financiers))
 
-                # articles.append({'date': date, 'article': article.getText(separator=" ", strip=True), 'link': link})
-                break
+                break  # Prevent re-running for every character in for loop if ran once
 
     for test in articles:
         print(test)
