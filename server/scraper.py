@@ -22,7 +22,7 @@ currency = ["$", "€", "£", "¥"]
 
 class Article(BaseModel):
     company_name: Optional[str]
-    funding: Optional[str]
+    funding: Optional[int]
     location: Optional[str]
     series: Optional[str]
     financiers: Optional[List[str]]
@@ -99,7 +99,9 @@ def parse_html(html_data, site):
         case Sites.FINSMES.value:
             articles = parse_articles(soup, article_tag="article", date_tag="time")
             print(articles)
- #TODO: create list of Article objects, populate each object and call to add to db
+
+
+# TODO: create list of Article objects, populate each object and call to add to db
 
 def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
     articles = []
@@ -114,7 +116,8 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 data = tokenize(article.text)  # Run article text through NER model
                 company_name = parse_orgs(data)  # Get company name
                 location = parse_location(data)  # Get location
-                financiers = parse_financiers(data)  #Get list of financiers
+                financiers = parse_financiers(data)  # Get list of financiers
+                funding = parse_funding(article.text)
 
                 date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
                 if date_tag == 'time':
@@ -125,14 +128,15 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
                 link = link_parsed['href']
                 articles.append(Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
-                 company_name=company_name, series='test series', location=location,
-                 funding='$10000', financiers=financiers))
+                                        company_name=company_name, series='test series', location=location,
+                                        funding=funding, financiers=financiers))
 
                 break  # Prevent re-running for every character in for loop if ran once
 
     for test in articles:
         print(test)
     return articles
+
 
 def tokenize(article):
     API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
@@ -146,8 +150,8 @@ def tokenize(article):
 
     return data
 
-def parse_orgs(data):
 
+def parse_orgs(data):
     orgs = []
     for entry in data:
         if entry['entity_group'] == 'ORG' and not isVC(entry['word']):
@@ -156,12 +160,11 @@ def parse_orgs(data):
     if len(orgs) == 0:
         return None
 
-    return orgs[0]   #TODO: Figure out how to handle multiple orgs that aren't investors
+    return orgs[0]  # TODO: Figure out how to handle multiple orgs that aren't investors
 
 
 def isVC(organization):
-
-    #query list of known VCs on startup and check in there
+    # query list of known VCs on startup and check in there
     keywords = ['VC', 'Capital', 'Venture', 'Partner']
 
     for word in keywords:
@@ -170,8 +173,8 @@ def isVC(organization):
 
     return False
 
-def parse_financiers(data):
 
+def parse_financiers(data):
     financiers = []
     for entry in data:
         if entry['entity_group'] == 'ORG' and isVC(entry):
@@ -181,6 +184,8 @@ def parse_financiers(data):
         return None
 
     return financiers
+
+
 def parse_location(data):
     locations = []
     for entry in data:
@@ -192,7 +197,22 @@ def parse_location(data):
 
     return locations[0]
 
-# def parse_funding(article):
+
+def parse_funding(article):
+    funding = ''
+    for i in range(0, len(article)):
+        if article[i] in currency:
+            i += 1
+            while article[i].isdigit():
+                funding += article[i]
+                i += 1
+            if article[i].isspace():
+                i += 1
+            if article[i].lower() == 'm':
+                return int(funding) * 1000000
+            if article[i].lower() == 'b':
+                return int(funding) * 1000000000
+            return int(funding)
 
 def insert_db(articles):
     client = MongoClient(MONGO_CONNECTION_STR)
@@ -207,11 +227,11 @@ def insert_db(articles):
 
 if __name__ == '__main__':
     scrape()
-    a1 = Article(article='test article', link='test link', date='test date',
-                 company_name='test company name', series='test series', location='test location',
-                 funding='$10000', financiers=['financer1', 'financer2'])
-
-    a2 = Article(article='test article2', link='test link2', date='test date2',
-                 company_name='test company name2', series=None, location='test location2',
-                 funding='$100002', financiers=['financer12', 'financer22'])
+    # a1 = Article(article='test article', link='test link', date='test date',
+    #              company_name='test company name', series='test series', location='test location',
+    #              funding='$10000', financiers=['financer1', 'financer2'])
+    #
+    # a2 = Article(article='test article2', link='test link2', date='test date2',
+    #              company_name='test company name2', series=None, location='test location2',
+    #              funding='$100002', financiers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
