@@ -67,40 +67,6 @@ def scrape():
         parse_html(page.text, site)
 
 
-def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
-    articles = []
-    kwargs_article = dict(name=article_tag, class_=article_class)
-    kwargs_date = dict(name=date_tag, class_=date_class)
-    kwargs_link = dict(name='a', class_=link_class)
-
-    articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
-    for article in articles_parsed:
-        for character in article.text:
-            if character in currency:  # Only parse articles that have currency in content
-                data = tokenize(article.text)  # Run article text through NER model
-                company_name = parse_orgs(data)  # Get company name
-                location = parse_location(data)  # Get location
-                financiers = parse_financiers(data)  #Get list of financiers
-
-                date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
-                if date_tag == 'time':
-                    date = date_parse['datetime']
-                else:
-                    date = date_parse.text
-
-                link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
-                link = link_parsed['href']
-                articles.append(Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
-                 company_name=company_name, series='test series', location=location,
-                 funding='$10000', financiers=financiers))
-
-                break  # Prevent re-running for every character in for loop if ran once
-
-    for test in articles:
-        print(test)
-    return articles
-
-
 def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
     soup = BeautifulSoup(html_data, "html.parser")
@@ -134,6 +100,39 @@ def parse_html(html_data, site):
             articles = parse_articles(soup, article_tag="article", date_tag="time")
             print(articles)
  #TODO: create list of Article objects, populate each object and call to add to db
+
+def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
+    articles = []
+    kwargs_article = dict(name=article_tag, class_=article_class)
+    kwargs_date = dict(name=date_tag, class_=date_class)
+    kwargs_link = dict(name='a', class_=link_class)
+
+    articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
+    for article in articles_parsed:
+        for character in article.text:
+            if character in currency:  # Only parse articles that have currency in content
+                data = tokenize(article.text)  # Run article text through NER model
+                company_name = parse_orgs(data)  # Get company name
+                location = parse_location(data)  # Get location
+                financiers = parse_financiers(data)  #Get list of financiers
+
+                date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
+                if date_tag == 'time':
+                    date = date_parse['datetime']
+                else:
+                    date = date_parse.text
+
+                link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
+                link = link_parsed['href']
+                articles.append(Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
+                 company_name=company_name, series='test series', location=location,
+                 funding='$10000', financiers=financiers))
+
+                break  # Prevent re-running for every character in for loop if ran once
+
+    for test in articles:
+        print(test)
+    return articles
 
 def tokenize(article):
     API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
