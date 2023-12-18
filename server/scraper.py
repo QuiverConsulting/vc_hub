@@ -8,6 +8,7 @@ from pymongo.mongo_client import MongoClient
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
+import urllib.parse
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -52,6 +53,31 @@ sites = {
     Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
     #        SITES.FINSMES: 'https://www.finsmes.com/'
 }
+
+
+def geekwire_airtable_scrape():
+    # get access policy and request id
+    url = 'https://airtable.com/app4aeBWKz5zcH0Fd/shrDVedlKm56eYymz/tblCYUF5t4ysJ8QDY'
+    headers = {'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                  'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+
+    page = requests.get(url, headers=headers)
+    try:
+        access_policy = page.text.split('accessPolicy=')[1].split('"')[0]
+        request_id = page.text.split('requestId: ')[1].split('"')[1]
+    except Exception as e:
+        logging.error(f"Error while finding access policy or request Id for Geekwire's airtable: {e}")
+        return
+
+    url = 'https://airtable.com/v0.3/view/viwFGZJAxhd0l0nWG/readSharedViewData'
+    params = {'requestId':request_id, 'accessPolicy':f'{urllib.parse.unquote(access_policy)}'}
+    headers = {'x-airtable-application-id':'app4aeBWKz5zcH0Fd',
+               'x-requested-with':'XMLHttpRequest', 'x-time-zone':'America/Toronto'}
+
+    page = requests.get(url, headers=headers, params=params)
+
+    with open(f"htmlFiles/html_airtable.txt", 'w', encoding="utf-8") as html_file:
+        html_file.write(page.text)
 
 
 def scrape():
@@ -226,7 +252,7 @@ def insert_db(articles):
 
 
 if __name__ == '__main__':
-    scrape()
+    # scrape()
     # a1 = Article(article='test article', link='test link', date='test date',
     #              company_name='test company name', series='test series', location='test location',
     #              funding='$10000', financiers=['financer1', 'financer2'])
@@ -235,3 +261,4 @@ if __name__ == '__main__':
     #              company_name='test company name2', series=None, location='test location2',
     #              funding='$100002', financiers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
+    # geekwire_airtable_scrape()
