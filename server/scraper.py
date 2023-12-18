@@ -18,11 +18,12 @@ MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')
 DB_COLLECTION = os.getenv('DB_COLLECTION')
 
-currency = ["$", "€", "£", "¥"]
+currencies = ["$", "€", "£", "¥"]
 
 
 class Article(BaseModel):
     company_name: Optional[str]
+    currency: Optional[str]
     funding: Optional[int]
     location: Optional[str]
     series: Optional[str]
@@ -81,50 +82,48 @@ def geekwire_airtable_scrape():
 
 
 def scrape():
-    if not os.path.exists('htmlFiles'):
-        os.makedirs('htmlFiles')
+    # if not os.path.exists('htmlFiles'):
+    #     os.makedirs('htmlFiles')
+    articles = []
     for site in sites:
         logging.info(f'Scraping {sites[site]}...')
         page = requests.get(sites[site], headers={'User-Agent': 'VC_HUB'})
 
-        with open(f"htmlFiles/html_{site.value}.txt", 'w', encoding="utf-8") as html_file:
-            html_file.write(page.text)
+        # with open(f"htmlFiles/html_{site.value}.txt", 'w', encoding="utf-8") as html_file:
+        #     html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
-        parse_html(page.text, site)
+        articles.extend(parse_html(page.text, site))
+
+    return articles
 
 
 def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
     soup = BeautifulSoup(html_data, "html.parser")
+    articles = None
     match site.value:
         case Sites.TECHRUNCH_STARTUPS.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                       "time")
-            print(articles)
         case Sites.TECHCRUNCH_VENTURE.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
                                       "time")
-            print(articles)
         case Sites.CRUNCHBASE.value:
             articles = parse_articles(soup, "article", ["herald-lay-b", "herald-lay-f"],
                                       date_class="updated")
-            print(articles)
         case Sites.CRUNCHBASE_SEED.value:
             articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
                                       date_class="updated")
-            print(articles)
         case Sites.EUSTARTUPS.value:
             # TODO: handle duplicate articles
             articles = parse_articles(soup, "div", "td-animation-stack", "time")
-            print(articles)
         case Sites.SIFTED.value:
             articles = parse_articles(soup, "li", "m-0",
                                       date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
-            # print(articles)
-
         case Sites.FINSMES.value:
             articles = parse_articles(soup, article_tag="article", date_tag="time")
-            print(articles)
+
+    return articles
 
 
 # TODO: create list of Article objects, populate each object and call to add to db
@@ -138,7 +137,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
     articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
     for article in articles_parsed:
         for character in article.text:
-            if character in currency:  # Only parse articles that have currency in content
+            if character in currencies:  # Only parse articles that have currency in content
                 data = tokenize(article.text)  # Run article text through NER model
                 company_name = parse_orgs(data)  # Get company name
                 location = parse_location(data)  # Get location
@@ -153,14 +152,16 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
 
                 link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
                 link = link_parsed['href']
-                articles.append(Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
+
+                a = Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
                                         company_name=company_name, series='test series', location=location,
-                                        funding=funding, financiers=financiers))
+                                        funding=funding, financiers=financiers, currency=character)
+
+                articles.append(a.model_dump())
 
                 break  # Prevent re-running for every character in for loop if ran once
 
-    for test in articles:
-        print(test)
+    # for test in articles
     return articles
 
 
@@ -227,7 +228,7 @@ def parse_location(data):
 def parse_funding(article):
     funding = ''
     for i in range(0, len(article)):
-        if article[i] in currency:
+        if article[i] in currencies:
             i += 1
             while article[i].isdigit():
                 funding += article[i]
@@ -252,7 +253,7 @@ def insert_db(articles):
 
 
 if __name__ == '__main__':
-    # scrape()
+
     # a1 = Article(article='test article', link='test link', date='test date',
     #              company_name='test company name', series='test series', location='test location',
     #              funding='$10000', financiers=['financer1', 'financer2'])
@@ -262,3 +263,4 @@ if __name__ == '__main__':
     #              funding='$100002', financiers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
     # geekwire_airtable_scrape()
+    insert_db(scrape())
