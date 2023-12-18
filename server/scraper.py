@@ -86,7 +86,7 @@ def geekwire_airtable_scrape():
                   'date_id': next(col for col in columns if col["name"] == 'Date')['id'],
                   'amount_id': next(col for col in columns if col["name"] == 'Amount')['id'],
                   'series_id': next(col for col in columns if col["name"] == 'Series')['id'],
-                  'leader_investor_id': next(col for col in columns if col["name"] == 'Lead Investor')['id'],
+                  'lead_investor_id': next(col for col in columns if col["name"] == 'Lead Investor')['id'],
                   'coverage_id': next(col for col in columns if col["name"] == 'Coverage')['id']
                   }
 
@@ -101,12 +101,12 @@ def geekwire_airtable_scrape():
 
         series = row['cellValuesByColumnId'][column_ids['series_id']] if column_ids['series_id'] in row[
             'cellValuesByColumnId'] else None
-        financiers = row['cellValuesByColumnId'][column_ids['leader_investor_id']].split(", ") if column_ids['leader_investor_id'] in row['cellValuesByColumnId'] else None
+        financiers = row['cellValuesByColumnId'][column_ids['lead_investor_id']].split(", ") if column_ids['lead_investor_id'] in row['cellValuesByColumnId'] else None
         link = row['cellValuesByColumnId'][column_ids['coverage_id']] if column_ids['coverage_id'] in row[
             'cellValuesByColumnId'] else None
 
         a = Article(company_name=company_name, funding=funding, series=series, financiers=financiers, link=link,
-                    date=date, currency='$', location=None)
+                    date=date, currency='$', location='USA')
         articles.append(a.model_dump())
     return articles
 
@@ -184,7 +184,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
                 link = link_parsed['href']
 
-                a = Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
+                a = Article(link=link, date=date,
                             company_name=company_name, series='test series', location=location,
                             funding=funding, financiers=financiers, currency=character)
 
