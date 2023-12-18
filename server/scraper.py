@@ -59,8 +59,9 @@ sites = {
 def geekwire_airtable_scrape():
     # get access policy and request id
     url = 'https://airtable.com/app4aeBWKz5zcH0Fd/shrDVedlKm56eYymz/tblCYUF5t4ysJ8QDY'
-    headers = {'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                  'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    headers = {
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
 
     page = requests.get(url, headers=headers)
     try:
@@ -70,15 +71,44 @@ def geekwire_airtable_scrape():
         logging.error(f"Error while finding access policy or request Id for Geekwire's airtable: {e}")
         return
 
+    # get table data
     url = 'https://airtable.com/v0.3/view/viwFGZJAxhd0l0nWG/readSharedViewData'
-    params = {'requestId':request_id, 'accessPolicy':f'{urllib.parse.unquote(access_policy)}'}
-    headers = {'x-airtable-application-id':'app4aeBWKz5zcH0Fd',
-               'x-requested-with':'XMLHttpRequest', 'x-time-zone':'America/Toronto'}
+    params = {'requestId': request_id, 'accessPolicy': f'{urllib.parse.unquote(access_policy)}'}
+    headers = {'x-airtable-application-id': 'app4aeBWKz5zcH0Fd',
+               'x-requested-with': 'XMLHttpRequest', 'x-time-zone': 'America/Toronto'}
 
-    page = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params)
 
-    with open(f"htmlFiles/html_airtable.txt", 'w', encoding="utf-8") as html_file:
-        html_file.write(page.text)
+    json_data = response.json()
+    columns = json_data['data']['columns']
+
+    column_ids = {'company_id': next(col for col in columns if col["name"] == 'Company')['id'],
+                  'date_id': next(col for col in columns if col["name"] == 'Date')['id'],
+                  'amount_id': next(col for col in columns if col["name"] == 'Amount')['id'],
+                  'series_id': next(col for col in columns if col["name"] == 'Series')['id'],
+                  'leader_investor_id': next(col for col in columns if col["name"] == 'Lead Investor')['id'],
+                  'coverage_id': next(col for col in columns if col["name"] == 'Coverage')['id']
+                  }
+
+    articles = []
+    for row in json_data['data']['rows']:
+        company_name = row['cellValuesByColumnId'][column_ids['company_id']] if column_ids['company_id'] in row[
+            'cellValuesByColumnId'] else None
+        date = row['cellValuesByColumnId'][column_ids['date_id']] if column_ids['date_id'] in row[
+            'cellValuesByColumnId'] else None
+        funding = row['cellValuesByColumnId'][column_ids['amount_id']] if column_ids['amount_id'] in row[
+            'cellValuesByColumnId'] else None
+
+        series = row['cellValuesByColumnId'][column_ids['series_id']] if column_ids['series_id'] in row[
+            'cellValuesByColumnId'] else None
+        financiers = row['cellValuesByColumnId'][column_ids['leader_investor_id']].split(", ") if column_ids['leader_investor_id'] in row['cellValuesByColumnId'] else None
+        link = row['cellValuesByColumnId'][column_ids['coverage_id']] if column_ids['coverage_id'] in row[
+            'cellValuesByColumnId'] else None
+
+        a = Article(company_name=company_name, funding=funding, series=series, financiers=financiers, link=link,
+                    date=date, currency='$', location=None)
+        articles.append(a.model_dump())
+    return articles
 
 
 def scrape():
@@ -93,6 +123,7 @@ def scrape():
         #     html_file.write(page.text)
         logging.info(f'Parsing {sites[site]}...')
         articles.extend(parse_html(page.text, site))
+    articles.extend(geekwire_airtable_scrape())
 
     return articles
 
@@ -154,8 +185,8 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 link = link_parsed['href']
 
                 a = Article(article=article.getText(separator=" ", strip=True), link=link, date=date,
-                                        company_name=company_name, series='test series', location=location,
-                                        funding=funding, financiers=financiers, currency=character)
+                            company_name=company_name, series='test series', location=location,
+                            funding=funding, financiers=financiers, currency=character)
 
                 articles.append(a.model_dump())
 
@@ -241,6 +272,7 @@ def parse_funding(article):
                 return int(funding) * 1000000000
             return int(funding)
 
+
 def insert_db(articles):
     client = MongoClient(MONGO_CONNECTION_STR)
     try:
@@ -253,7 +285,6 @@ def insert_db(articles):
 
 
 if __name__ == '__main__':
-
     # a1 = Article(article='test article', link='test link', date='test date',
     #              company_name='test company name', series='test series', location='test location',
     #              funding='$10000', financiers=['financer1', 'financer2'])
@@ -262,5 +293,4 @@ if __name__ == '__main__':
     #              company_name='test company name2', series=None, location='test location2',
     #              funding='$100002', financiers=['financer12', 'financer22'])
     # insert_db([a1.model_dump(), a2.model_dump()])
-    # geekwire_airtable_scrape()
     insert_db(scrape())
