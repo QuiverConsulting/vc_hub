@@ -32,9 +32,23 @@ class Article(BaseModel):
     link: Optional[str]
     timestamp: datetime = Field(default_factory=datetime.now)
 
+    def __hash__(self):
+        return hash((self.company_name, self.currency, self.funding, self.location, self.series, self.date, self.link, str(self.financiers)))
+
+    def __eq__(self, other):
+        return (
+            self.company_name == other.company_name and
+            self.currency == other.currency and
+            self.funding == other.funding and
+            self.location == other.location and
+            self.series == other.series and
+            self.date == other.date and
+            self.link == other.link and
+            str(self.financiers) == str(other.financiers)
+        )
+
 
 class Sites(Enum):
-    GEEKWIRE = 'geekwire'
     TECHRUNCH_STARTUPS = 'teachcrunch_startups'
     TECHCRUNCH_VENTURE = 'techcrunch_venture'
     CRUNCHBASE = 'crunchbase'
@@ -45,7 +59,6 @@ class Sites(Enum):
 
 
 sites = {
-    #        SITES.GEEKWIRE: 'https://www.geekwire.com/fundings/',
     #        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
     #        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
     #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
@@ -131,7 +144,7 @@ def scrape():
 def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
     soup = BeautifulSoup(html_data, "html.parser")
-    articles = None
+    articles = []
     match site.value:
         case Sites.TECHRUNCH_STARTUPS.value:
             articles = parse_articles(soup, "div", "post-block post-block--image post-block--unread",
@@ -146,7 +159,6 @@ def parse_html(html_data, site):
             articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
                                       date_class="updated")
         case Sites.EUSTARTUPS.value:
-            # TODO: handle duplicate articles
             articles = parse_articles(soup, "div", "td-animation-stack", "time")
         case Sites.SIFTED.value:
             articles = parse_articles(soup, "li", "m-0",
@@ -157,10 +169,8 @@ def parse_html(html_data, site):
     return articles
 
 
-# TODO: create list of Article objects, populate each object and call to add to db
-
 def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_class=None, link_class=None):
-    articles = []
+    article_set = set()
     kwargs_article = dict(name=article_tag, class_=article_class)
     kwargs_date = dict(name=date_tag, class_=date_class)
     kwargs_link = dict(name='a', class_=link_class)
@@ -187,14 +197,13 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 a = Article(link=link, date=date,
                             company_name=company_name, series='test series', location=location,
                             funding=funding, financiers=financiers, currency=character)
-
-                articles.append(a.model_dump())
+                article_set.add(a)
 
                 break  # Prevent re-running for every character in for loop if ran once
-
-    # for test in articles
-    return articles
-
+    article_list = []
+    for article in article_set:
+        article_list.append(article.model_dump())
+    return article_list
 
 def tokenize(article):
     API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
@@ -285,12 +294,12 @@ def insert_db(articles):
 
 
 if __name__ == '__main__':
-    # a1 = Article(article='test article', link='test link', date='test date',
+    # a1 = Article( link='test link', date='test date',
     #              company_name='test company name', series='test series', location='test location',
-    #              funding='$10000', financiers=['financer1', 'financer2'])
+    #              funding=10000,  currency='$', financiers=['financer1', 'financer2'])
     #
-    # a2 = Article(article='test article2', link='test link2', date='test date2',
-    #              company_name='test company name2', series=None, location='test location2',
-    #              funding='$100002', financiers=['financer12', 'financer22'])
-    # insert_db([a1.model_dump(), a2.model_dump()])
+    # a2 = Article( link='test link', date='test date',
+    #              company_name='test company name', series='test series', location='test location',
+    #              funding=10000,  currency='$', financiers=['financer1', 'financer2'])
+    # print(len(set([a1, a2])))
     insert_db(scrape())
