@@ -4,6 +4,7 @@ import logging
 from bs4 import BeautifulSoup
 from enum import Enum
 from dotenv import load_dotenv
+from pymongo import UpdateOne
 from pymongo.mongo_client import MongoClient
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -287,8 +288,9 @@ def insert_db(articles):
     try:
         db = client[DB_NAME]
         collection = db[DB_COLLECTION]
-        collection.insert_many(articles)
-        logging.info(f"Inserted {len(articles)} records into db.")
+        upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
+        result = collection.bulk_write(upserts)
+        logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
     except Exception as e:
         logging.error(f"Error while inserting to db: {e}\n articles: {articles}.")
 
@@ -298,8 +300,9 @@ if __name__ == '__main__':
     #              company_name='test company name', series='test series', location='test location',
     #              funding=10000,  currency='$', financiers=['financer1', 'financer2'])
     #
-    # a2 = Article( link='test link', date='test date',
-    #              company_name='test company name', series='test series', location='test location',
-    #              funding=10000,  currency='$', financiers=['financer1', 'financer2'])
-    # print(len(set([a1, a2])))
+    # a2 = Article( link='test link2', date='test date2',
+    #              company_name='test company name2', series='test series2', location='test location2',
+    #              funding=100002,  currency='$', financiers=['financer12', 'financer22'])
+    #
+    # insert_db([a1.model_dump(), a2.model_dump()])
     insert_db(scrape())
