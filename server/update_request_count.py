@@ -18,7 +18,8 @@ def update_request_count():
     try:
         db = client[DB_NAME]
         collection = db[DB_REQUEST_COUNT_COLLECTION]
-        # TODO: update counter in db +2 (this lambda + the one that called it)
+        # update counter in db +2 (this lambda + the one that called it)
+        collection.update_one({"title": "count"}, {'$inc': {'value': 2}}, upsert=True)
         logging.info(f"Incremented request counter.")
     except Exception as e:
         logging.error(f"Error while updating request counter: {e}.")
