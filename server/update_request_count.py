@@ -5,8 +5,8 @@ from pymongo import MongoClient
 import logging
 import sys
 
-logging.basicConfig(level=logging.INFO)
 load_dotenv()
+logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
 MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')

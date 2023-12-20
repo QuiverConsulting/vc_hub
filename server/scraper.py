@@ -13,8 +13,9 @@ import urllib.parse
 import update_request_count
 import re
 
-logging.basicConfig(level=logging.INFO)
 load_dotenv()
+logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+
 
 API_URL = os.getenv('API_URL')
 API_TOKEN = os.getenv('API_TOKEN')
@@ -127,6 +128,7 @@ def geekwire_airtable_scrape():
         a = Article(company_name=company_name, funding=funding, series=series, financiers=financiers, link=link,
                     date=date, currency='$', location='USA')
         articles.append(a.model_dump())
+    logging.debug(f"Got {len(articles)} articles from geekwire's airtable: {articles}")
     return articles
 
 
@@ -172,6 +174,7 @@ def parse_html(html_data, site):
         case Sites.FINSMES.value:
             articles = parse_articles(soup, article_tag="article", date_tag="time")
 
+    logging.debug(f"Got {len(articles)} articles from {site.value}: {articles}")
     return articles
 
 

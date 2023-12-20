@@ -1,7 +1,11 @@
 # lambda endpoint for our frontend to get the vc funding data
+import os
+from dotenv import load_dotenv
 import logging
 import update_request_count
-logging.basicConfig(level=logging.INFO)
+
+load_dotenv()
+logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
 def get_funding_data():
     pass
