@@ -46,3 +46,4 @@ server/.env
 
 # System Dirs
 server/htmlFiles/
+*.pyc

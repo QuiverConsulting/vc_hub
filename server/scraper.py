@@ -10,6 +10,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import urllib.parse
+import update_request_count
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -17,7 +18,7 @@ load_dotenv()
 API_TOKEN = os.getenv('API_TOKEN')
 MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')
-DB_COLLECTION = os.getenv('DB_COLLECTION')
+DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
 
 currencies = ["$", "€", "£", "¥"]
 
@@ -287,13 +288,14 @@ def insert_db(articles):
     client = MongoClient(MONGO_CONNECTION_STR)
     try:
         db = client[DB_NAME]
-        collection = db[DB_COLLECTION]
+        collection = db[DB_FUNDING_COLLECTION]
         upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
         result = collection.bulk_write(upserts)
         logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
     except Exception as e:
         logging.error(f"Error while inserting to db: {e}\n articles: {articles}.")
-
+    finally:
+        client.close()
 
 if __name__ == '__main__':
     # a1 = Article( link='test link', date='test date',
@@ -305,4 +307,11 @@ if __name__ == '__main__':
     #              funding=100002,  currency='$', financiers=['financer12', 'financer22'])
     #
     # insert_db([a1.model_dump(), a2.model_dump()])
-    insert_db(scrape())
+    try:
+        insert_db(scrape())
+    except Exception as e:
+        logging.error(f"Error while scraping data: {e}")
+    finally:
+        update_request_count.main()
+
+
