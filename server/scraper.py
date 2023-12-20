@@ -11,10 +11,12 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 import urllib.parse
 import update_request_count
+import re
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
+API_URL = os.getenv('API_URL')
 API_TOKEN = os.getenv('API_TOKEN')
 MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')
@@ -80,6 +82,7 @@ def geekwire_airtable_scrape():
 
     page = requests.get(url, headers=headers)
     try:
+        logging.info(f'Scraping {url}...')
         access_policy = page.text.split('accessPolicy=')[1].split('"')[0]
         request_id = page.text.split('requestId: ')[1].split('"')[1]
     except Exception as e:
@@ -97,6 +100,7 @@ def geekwire_airtable_scrape():
     json_data = response.json()
     columns = json_data['data']['columns']
 
+    logging.info(f'Parsing {url}...')
     column_ids = {'company_id': next(col for col in columns if col["name"] == 'Company')['id'],
                   'date_id': next(col for col in columns if col["name"] == 'Date')['id'],
                   'amount_id': next(col for col in columns if col["name"] == 'Amount')['id'],
@@ -208,7 +212,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
     return article_list
 
 def tokenize(article):
-    API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
+    # API_URL = "https://api-inference.huggingface.co/models/dslim/bert-base-NER"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
     def query(payload):
@@ -223,7 +227,7 @@ def tokenize(article):
 def parse_orgs(data):
     orgs = []
     for entry in data:
-        if entry['entity_group'] == 'ORG' and not isVC(entry['word']):
+        if entry['entity_group'] == 'ORG' and re.match(r'([\w\s]+)', entry['word']) and not isVC(entry['word']):
             orgs.append(entry['word'])
 
     if len(orgs) == 0:
@@ -244,15 +248,15 @@ def isVC(organization):
 
 
 def parse_financiers(data):
-    financiers = []
+    financiers = set()
     for entry in data:
-        if entry['entity_group'] == 'ORG' and isVC(entry):
-            financiers.append(entry['word'])
+        if entry['entity_group'] == 'ORG' and re.match(r'([\w\s]+)', entry['word']) and isVC(entry['word']):
+            financiers.add(entry['word'])
 
     if len(financiers) == 0:
         return None
 
-    return financiers
+    return list(financiers)
 
 
 def parse_location(data):
