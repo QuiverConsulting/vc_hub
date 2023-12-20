@@ -128,6 +128,7 @@ def geekwire_airtable_scrape():
         a = Article(company_name=company_name, funding=funding, series=series, financiers=financiers, link=link,
                     date=date, currency='$', location='USA')
         articles.append(a.model_dump())
+        logging.debug(f"Got {len(articles)} articles from geekwire's airtable: {articles}")
     return articles
 
 
