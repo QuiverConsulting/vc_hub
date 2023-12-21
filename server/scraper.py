@@ -315,7 +315,8 @@ if __name__ == '__main__':
     #
     # insert_db([a1.model_dump(), a2.model_dump()])
     try:
-        insert_db(scrape())
+        # insert_db(scrape())
+        pass
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
     finally:
