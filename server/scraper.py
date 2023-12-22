@@ -10,7 +10,6 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import urllib.parse
-import update_request_count
 import re
 from dateutil import parser
 from datetime import datetime
@@ -306,10 +305,10 @@ def insert_db(articles):
     finally:
         client.close()
 
-if __name__ == '__main__':
-    try:
-        insert_db(scrape())
-    except Exception as e:
-        logging.error(f"Error while scraping data: {e}")
-    finally:
-        update_request_count.main()
+# if __name__ == '__main__':
+#     try:
+#         insert_db(scrape())
+#     except Exception as e:
+#         logging.error(f"Error while scraping data: {e}")
+#     finally:
+#         update_request_count.main()
