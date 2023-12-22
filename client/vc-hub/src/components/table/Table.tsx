@@ -5,10 +5,11 @@ import {
   useMaterialReactTable,
 } from "material-react-table";
 import getVCData from "../../apis/getVCData";
-import { Article } from "../../Interfaces";
+import { Article, VCData } from "../../Interfaces";
 import tableColumns from "./TableColumns";
 import styled from "styled-components";
 import { LinearProgress } from "@mui/material";
+import moment from "moment";
 
 const ProgressWrapper = styled.div`
   text-align: center;
@@ -22,14 +23,12 @@ const Table = () => {
   useEffect(() => {
     const expiry = localStorage.getItem("expiryDate");
 
-    if (expiry === null || (expiry !== null && parseInt(expiry) < Date.now())) {
-      console.log("getting data...");
-      getVCData()?.then((data: any)=> {
-        localStorage.setItem('articles', JSON.stringify(data));
-        let dateNow = new Date()
-        dateNow.setMinutes(dateNow.getMinutes() + 1);
-        localStorage.setItem('expiryDate',  dateNow.getTime().toString());
-        setArticles(data);
+    if (expiry === null || (expiry !== null && moment(expiry).isBefore(moment()))) {
+      getVCData()?.then((data)=> {
+        localStorage.setItem('articles', JSON.stringify(data.articles));
+        if (data.expiry_date)
+          localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
+        setArticles(data.articles);
       });
     } else {
       const localArticles = localStorage.getItem("articles");
