@@ -28,6 +28,7 @@ app.add_middleware(
 
 @app.get("/vc_funding_data")
 async def root():
+    global NEXT_SCRAPE_DATE
     return {"articles": get_funding_data(), "expiry_date": NEXT_SCRAPE_DATE}
 
 
