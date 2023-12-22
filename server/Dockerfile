@@ -5,6 +5,7 @@ COPY ./scraper.py ./
 COPY ./.env ./
 
 RUN pip install requests beautifulsoup4 python-dotenv pymongo pydantic DateTime typing urllib3 regex fastapi uvicorn
+EXPOSE 80
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
 
 
