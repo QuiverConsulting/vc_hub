@@ -12,6 +12,8 @@ from typing import Optional, List
 import urllib.parse
 import update_request_count
 import re
+from dateutil import parser
+from datetime import datetime
 
 load_dotenv()
 logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
@@ -33,7 +35,7 @@ class Article(BaseModel):
     location: Optional[str]
     series: Optional[str]
     financiers: Optional[List[str]]
-    date: Optional[str]
+    date: Optional[datetime]
     link: Optional[str]
     timestamp: datetime = Field(default_factory=datetime.now)
 
@@ -64,13 +66,13 @@ class Sites(Enum):
 
 
 sites = {
-           Sites.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
-           Sites.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
-           Sites.CRUNCHBASE: 'https://news.crunchbase.com/',
-           Sites.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
-           Sites.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-           Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
-           Sites.FINSMES: 'https://www.finsmes.com/'
+            Sites.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+            Sites.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
+            Sites.CRUNCHBASE: 'https://news.crunchbase.com/',
+            Sites.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
+            Sites.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
+            Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
+            Sites.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -114,7 +116,7 @@ def geekwire_airtable_scrape():
     for row in json_data['data']['rows']:
         company_name = row['cellValuesByColumnId'][column_ids['company_id']] if column_ids['company_id'] in row[
             'cellValuesByColumnId'] else None
-        date = row['cellValuesByColumnId'][column_ids['date_id']] if column_ids['date_id'] in row[
+        date = parser.parse(row['cellValuesByColumnId'][column_ids['date_id']]) if column_ids['date_id'] in row[
             'cellValuesByColumnId'] else None
         funding = row['cellValuesByColumnId'][column_ids['amount_id']] if column_ids['amount_id'] in row[
             'cellValuesByColumnId'] else None
@@ -196,15 +198,15 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
 
                 date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
                 if date_tag == 'time':
-                    date = date_parse['datetime']
+                    date = parser.parse(date_parse['datetime'])
                 else:
-                    date = date_parse.text
+                    date = datetime.strptime(date_parse.text, "%B %d, %Y")
 
                 link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
                 link = link_parsed['href']
 
                 a = Article(link=link, date=date,
-                            company_name=company_name, series='test series', location=location,
+                            company_name=company_name, series=None, location=location,
                             funding=funding, financiers=financiers, currency=character)
                 article_set.add(a)
 
