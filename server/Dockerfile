@@ -2,7 +2,7 @@ FROM python:3.12.1
 COPY ./main.py ./
 COPY ./get_vc_funding_data.py ./
 COPY ./scraper.py ./
-COPY ./.env ./
+# COPY ./.env ./
 
 RUN pip install requests beautifulsoup4 python-dotenv pymongo pydantic DateTime typing urllib3 regex fastapi uvicorn
 EXPOSE 80
