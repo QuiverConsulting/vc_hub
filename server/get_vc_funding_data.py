@@ -32,6 +32,9 @@ def get_funding_data():
         client.close()
         return entries
 
+def test():
+    return DB_NAME
+
 
 if __name__ == '__main__':
     get_funding_data()
