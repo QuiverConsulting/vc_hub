@@ -6,7 +6,6 @@ from enum import Enum
 from dotenv import load_dotenv
 from pymongo import UpdateOne
 from pymongo.mongo_client import MongoClient
-from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import urllib.parse

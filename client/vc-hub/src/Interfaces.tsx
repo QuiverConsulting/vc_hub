@@ -12,5 +12,5 @@ export interface Article {
 
 export interface VCData {
   articles: Article[];
-  expiryDate: Date | string;
+  expiry_date: Date | null;
 }
