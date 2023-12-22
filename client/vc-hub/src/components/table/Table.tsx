@@ -23,20 +23,14 @@ const Table = () => {
     const expiry = localStorage.getItem("expiryDate");
 
     if (expiry === null || (expiry !== null && parseInt(expiry) < Date.now())) {
-      // getVCData()?.then(data=> {
-      //   localStorage.setItem('articles', JSON.stringify(data));
-      //   let dateNow = new Date()
-      //   dateNow.setMinutes(dateNow.getMinutes() + 1);
-      //   localStorage.setItem('expiryDate',  dateNow.getTime().toString());
-      //   setArticles(data);
-      // });
       console.log("getting data...");
-      const data = getVCData();
-      localStorage.setItem("articles", JSON.stringify(data));
-      let dateNow = new Date();
-      dateNow.setMinutes(dateNow.getMinutes() + 1);
-      localStorage.setItem("expiryDate", dateNow.getTime().toString());
-      setArticles(data);
+      getVCData()?.then((data: any)=> {
+        localStorage.setItem('articles', JSON.stringify(data));
+        let dateNow = new Date()
+        dateNow.setMinutes(dateNow.getMinutes() + 1);
+        localStorage.setItem('expiryDate',  dateNow.getTime().toString());
+        setArticles(data);
+      });
     } else {
       const localArticles = localStorage.getItem("articles");
       if (localArticles) setArticles(JSON.parse(localArticles));
@@ -50,6 +44,7 @@ const Table = () => {
     initialState: {
       density: "compact",
       pagination: { pageSize: 25, pageIndex: 0 },
+      sorting: [{id: "date", desc:true}]
     },
     muiTableContainerProps: { sx: { maxHeight: "65vh" } },
     enableStickyHeader: true,

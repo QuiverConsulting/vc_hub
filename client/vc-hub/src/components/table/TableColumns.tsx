@@ -1,5 +1,6 @@
 import { MRT_ColumnDef } from "material-react-table";
 import { Article } from "../../Interfaces";
+import moment from "moment";
 
 const tableColumns: MRT_ColumnDef<Article>[] = [
   {
@@ -8,14 +9,14 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
     size: 150,
   },
   {
-    accessorKey: "funding",
-    header: "Funding",
-    size: 100,
-  },
-  {
     accessorKey: "currency",
     header: "Currency",
     size: 50,
+  },
+  {
+    accessorKey: "funding",
+    header: "Funding",
+    size: 100,
   },
   {
     accessorKey: "location",
@@ -36,6 +37,8 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
   },
   {
     accessorKey: "date",
+    Cell: ({ cell }) => moment(cell.getValue<Date>()).format('MMMM DD, YYYY'), 
+    sortingFn: 'datetime',
     header: "Date",
     size: 100,
   },
