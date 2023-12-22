@@ -7,3 +7,7 @@ app = FastAPI()
 @app.get("/vc_funding_data")
 async def root():
     return get_funding_data()
+
+@app.get("/test")
+async def root():
+    return test()

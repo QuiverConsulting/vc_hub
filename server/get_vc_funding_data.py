@@ -20,9 +20,13 @@ def get_funding_data():
     try:
         db = client[DB_NAME]
         collection = db[DB_FUNDING_COLLECTION]
+        count = 1
+        logging.info("Successfully connected to db")
 
         for d in collection.find({},{"_id":0}).sort({ "$natural": 1} ):
             entries.append(d)
+            logging.info(f"Appending to list {count}")
+            count += 1
 
     except Exception as e:
         logging.error(f"Error while getting data: {e}")
@@ -30,7 +34,11 @@ def get_funding_data():
         return f"Error while getting data: {e}"
     finally:
         client.close()
+        logging.info("Returning info to FASTAPI")
         return entries
+
+def test():
+    return DB_NAME
 
 
 if __name__ == '__main__':
