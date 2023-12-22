@@ -33,6 +33,7 @@ async def root():
 
 def populateDb():
     try:
+        global NEXT_SCRAPE_DATE
         NEXT_SCRAPE_DATE = datetime.datetime.now() + datetime.timedelta(days=1)
         insert_db(scrape())
         logging.info("ran successfully")
