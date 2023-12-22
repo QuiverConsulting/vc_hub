@@ -64,13 +64,13 @@ class Sites(Enum):
 
 
 sites = {
-    #        SITES.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
-    #        SITES.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
-    #        SITES.CRUNCHBASE: 'https://news.crunchbase.com/',
-    #        SITES.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
-    #        SITES.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
-    Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
-    #        SITES.FINSMES: 'https://www.finsmes.com/'
+           Sites.TECHRUNCH_STARTUPS: 'https://techcrunch.com/category/startups/',
+           Sites.TECHCRUNCH_VENTURE: 'https://techcrunch.com/category/venture/',
+           Sites.CRUNCHBASE: 'https://news.crunchbase.com/',
+           Sites.CRUNCHBASE_SEED: 'https://news.crunchbase.com/sections/seed/',
+           Sites.EUSTARTUPS: 'https://www.eu-startups.com/category/fundin/',
+           Sites.SIFTED: 'https://sifted.eu/sector/venture-capital',
+           Sites.FINSMES: 'https://www.finsmes.com/'
 }
 
 
@@ -305,21 +305,9 @@ def insert_db(articles):
         client.close()
 
 if __name__ == '__main__':
-    # a1 = Article( link='test link', date='test date',
-    #              company_name='test company name', series='test series', location='test location',
-    #              funding=10000,  currency='$', financiers=['financer1', 'financer2'])
-    #
-    # a2 = Article( link='test link2', date='test date2',
-    #              company_name='test company name2', series='test series2', location='test location2',
-    #              funding=100002,  currency='$', financiers=['financer12', 'financer22'])
-    #
-    # insert_db([a1.model_dump(), a2.model_dump()])
     try:
-        # insert_db(scrape())
-        pass
+        insert_db(scrape())
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
     finally:
         update_request_count.main()
-
-

@@ -2,18 +2,36 @@
 import os
 from dotenv import load_dotenv
 import logging
-import update_request_count
+from pymongo import MongoClient
 
 load_dotenv()
-logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')),
+                    format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s",
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
+DB_NAME = os.getenv('DB_NAME')
+DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
+
 
 def get_funding_data():
-    pass
-
-if __name__ == '__main__':
+    client = MongoClient(MONGO_CONNECTION_STR)
+    entries = []
     try:
-        get_funding_data()
+        db = client[DB_NAME]
+        collection = db[DB_FUNDING_COLLECTION]
+
+        for d in collection.find({},{"_id":0}).sort({ "$natural": 1} ):
+            entries.append(d)
+
     except Exception as e:
         logging.error(f"Error while getting data: {e}")
+        client.close()
+        return f"Error while getting data: {e}"
     finally:
-        update_request_count.main()
+        client.close()
+        return entries
+
+
+if __name__ == '__main__':
+    get_funding_data()
