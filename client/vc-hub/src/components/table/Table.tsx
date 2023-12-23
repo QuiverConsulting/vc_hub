@@ -5,7 +5,7 @@ import {
   useMaterialReactTable,
 } from "material-react-table";
 import getVCData from "../../apis/getVCData";
-import { Article, VCData } from "../../Interfaces";
+import { Article } from "../../Interfaces";
 import tableColumns from "./TableColumns";
 import styled from "styled-components";
 import { LinearProgress } from "@mui/material";
