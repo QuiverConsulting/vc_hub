@@ -37,13 +37,16 @@ def populateDb():
         global NEXT_SCRAPE_DATE
         NEXT_SCRAPE_DATE = datetime.datetime.now() + datetime.timedelta(days=1)
         insert_db(scrape())
-        logging.info("ran successfully")
+        logging.info("Scraper ran successfully")
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
 
+def keepAwake():
+    logging.info(f"Next scrape date: {NEXT_SCRAPE_DATE}")
 
 @app.on_event("startup")
 async def schedule_periodic():
     app.scheduler = AsyncIOScheduler()
     app.scheduler.add_job(populateDb, 'cron', hour=os.getenv('CRON_HOUR'), minute="0")
+    app.scheduler.add_job(keepAwake, 'interval', minutes=28)
     app.scheduler.start()
