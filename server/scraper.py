@@ -305,8 +305,8 @@ def insert_db(articles):
     finally:
         client.close()
 
-if __name__ == '__main__':
-    try:
-        insert_db(scrape())
-    except Exception as e:
-        logging.error(f"Error while scraping data: {e}")
+# if __name__ == '__main__':
+#     try:
+#         insert_db(scrape())
+#     except Exception as e:
+#         logging.error(f"Error while scraping data: {e}")
