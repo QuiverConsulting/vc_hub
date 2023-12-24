@@ -279,16 +279,16 @@ def parse_funding(article):
     for i in range(0, len(article)):
         if article[i] in currencies:
             i += 1
-            while article[i].isdigit():
+            while article[i].isdigit() or article[i] == '.':
                 funding += article[i]
                 i += 1
             if article[i].isspace():
                 i += 1
             if article[i].lower() == 'm':
-                return int(funding) * 1000000
+                return round(float(funding) * 1000000)
             if article[i].lower() == 'b':
-                return int(funding) * 1000000000
-            return int(funding)
+                return round(float(funding) * 1000000000)
+            return round(float(funding))
 
 
 def insert_db(articles):
@@ -296,6 +296,7 @@ def insert_db(articles):
     try:
         db = client[DB_NAME]
         collection = db[DB_FUNDING_COLLECTION]
+        collection.create_index('date')
         upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
         result = collection.bulk_write(upserts)
         logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
@@ -304,10 +305,8 @@ def insert_db(articles):
     finally:
         client.close()
 
-# if __name__ == '__main__':
-#     try:
-#         insert_db(scrape())
-#     except Exception as e:
-#         logging.error(f"Error while scraping data: {e}")
-#     finally:
-#         update_request_count.main()
+if __name__ == '__main__':
+    try:
+        insert_db(scrape())
+    except Exception as e:
+        logging.error(f"Error while scraping data: {e}")
