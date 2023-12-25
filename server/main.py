@@ -37,10 +37,13 @@ def populateDb():
         global NEXT_SCRAPE_DATE
         NEXT_SCRAPE_DATE = datetime.datetime.now() + datetime.timedelta(days=1)
         insert_db(scrape())
-        logging.info("ran successfully")
+        logging.info("Scraper ran successfully")
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
 
+@app.get("/wake_up")
+async def root():
+    return "Container woken up successfully"
 
 @app.on_event("startup")
 async def schedule_periodic():

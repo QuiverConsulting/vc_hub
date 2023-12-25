@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')),
 MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')
 DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
+NUM_FUNDING_ENTRIES = os.getenv('NUM_FUNDING_ENTRIES')
 
 
 def get_funding_data():
@@ -21,9 +22,13 @@ def get_funding_data():
         db = client[DB_NAME]
         collection = db[DB_FUNDING_COLLECTION]
         logging.info("Successfully connected to db")
-
-        for d in collection.find({},{"_id":0}).sort({ "$natural": 1} ):
+        collection.create_index('date')
+        i = 0
+        for d in collection.find({},{"_id":0}).sort({ "date": -1} ):
             entries.append(d)
+            i += 1
+            if i == 1500:
+                break
 
     except Exception as e:
         logging.error(f"Error while getting data: {e}")
@@ -33,3 +38,6 @@ def get_funding_data():
         client.close()
         logging.info("Returning info to FASTAPI")
         return entries
+
+# if __name__ == '__main__':
+#     logging.info(len(get_funding_data()))
