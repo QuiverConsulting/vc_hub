@@ -27,8 +27,11 @@ const Table = () => {
       getVCData()?.then((data)=> {
         localStorage.setItem('articles', JSON.stringify(data.articles));
         if (data.expiry_date)
+        {
           localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
-        setArticles(data.articles);
+          const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
+          setArticles(articlesSorted);
+        }
       });
     } else {
       const localArticles = localStorage.getItem("articles");
@@ -42,8 +45,7 @@ const Table = () => {
     data: articles ?? [],
     initialState: {
       density: "compact",
-      pagination: { pageSize: 25, pageIndex: 0 },
-      sorting: [{id: "date", desc:true}]
+      pagination: { pageSize: 25, pageIndex: 0 }
     },
     muiTableContainerProps: { sx: { maxHeight: "65vh" } },
     enableStickyHeader: true,
