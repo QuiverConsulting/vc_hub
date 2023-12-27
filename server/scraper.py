@@ -1,4 +1,6 @@
 import os
+
+import dateutil
 import requests
 import logging
 from bs4 import BeautifulSoup
@@ -22,9 +24,9 @@ API_TOKEN = os.getenv('API_TOKEN')
 MONGO_CONNECTION_STR = os.getenv('DB_CONNECTION_STR')
 DB_NAME = os.getenv('DB_NAME')
 DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
+DB_EXPIRY_DATE_COLLECTION = os.getenv('DB_EXPIRY_DATE_COLLECTION')
 
 currencies = ["$", "€", "£", "¥"]
-
 
 class Article(BaseModel):
     company_name: Optional[str]
@@ -145,9 +147,7 @@ def scrape():
         logging.info(f'Parsing {sites[site]}...')
         articles.extend(parse_html(page.text, site))
     articles.extend(geekwire_airtable_scrape())
-
     return articles
-
 
 def parse_html(html_data, site):
     # there are different parsers that we can use besides html.parser
@@ -291,7 +291,7 @@ def parse_funding(article):
             return round(float(funding))
 
 
-def insert_db(articles):
+def insert_db(articles, next_scrape_date: datetime):
     client = MongoClient(MONGO_CONNECTION_STR)
     try:
         db = client[DB_NAME]
@@ -299,7 +299,12 @@ def insert_db(articles):
         collection.create_index('date')
         upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
         result = collection.bulk_write(upserts)
+        collection = db[DB_EXPIRY_DATE_COLLECTION]
+        collection.update_one({"title": "expiry_date"}, {"$set": {'expiry_date': next_scrape_date}}, upsert=True)
+        logging.debug(f"Updated expiry date in db to {next_scrape_date}.")
         logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
+
+
     except Exception as e:
         logging.error(f"Error while inserting to db: {e}\n articles: {articles}.")
     finally:
