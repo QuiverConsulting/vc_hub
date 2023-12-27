@@ -18,6 +18,7 @@ DB_EXPIRY_DATE_COLLECTION = os.getenv('DB_EXPIRY_DATE_COLLECTION')
 
 def get_funding_data():
     client = MongoClient(MONGO_CONNECTION_STR)
+    entries = {'articles': [], 'expiry_date': None}
     try:
         db = client[DB_NAME]
         collection = db[DB_FUNDING_COLLECTION]
@@ -26,14 +27,14 @@ def get_funding_data():
         data = list(collection.find({},{"_id":0}).sort({ "date": -1}).limit(int(NUM_FUNDING_ENTRIES)))
         collection = db[DB_EXPIRY_DATE_COLLECTION]
         expiry_date = collection.find_one({"title": "expiry_date"}, {'_id': 0})
-        return {'articles': data, 'expiry_date': expiry_date['expiry_date']}
+        entries = {'articles': data, 'expiry_date': expiry_date['expiry_date']}
 
     except Exception as e:
         logging.error(f"Error while getting data: {e}")
-        return {'articles': [], 'expiry_date': None}
     finally:
         client.close()
         logging.info("Returning info to FASTAPI")
+        return entries
 
 # if __name__ == '__main__':
 #     logging.info(len(get_funding_data()))
