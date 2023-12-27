@@ -29,9 +29,9 @@ const Table = () => {
         if (data.expiry_date)
         {
           localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
-          const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
-          setArticles(articlesSorted);
         }
+        const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
+        setArticles(articlesSorted);
       });
     } else {
       const localArticles = localStorage.getItem("articles");
