@@ -30,7 +30,6 @@ def get_funding_data():
 
     except Exception as e:
         logging.error(f"Error while getting data: {e}")
-        client.close()
         return {'articles': [], 'expiry_date': None}
     finally:
         client.close()
