@@ -11,8 +11,6 @@ load_dotenv()
 
 app = FastAPI()
 
-NEXT_SCRAPE_DATE = None
-
 origins = [
     "*"
 ]
@@ -28,15 +26,12 @@ app.add_middleware(
 
 @app.get("/vc_funding_data")
 async def root():
-    global NEXT_SCRAPE_DATE
-    return {"articles": get_funding_data(), "expiry_date": NEXT_SCRAPE_DATE}
+    return get_funding_data()
 
 
 def populateDb():
     try:
-        global NEXT_SCRAPE_DATE
-        NEXT_SCRAPE_DATE = datetime.datetime.now() + datetime.timedelta(days=1)
-        insert_db(scrape())
+        insert_db(scrape(), datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1))
         logging.info("Scraper ran successfully")
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
