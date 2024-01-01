@@ -284,6 +284,8 @@ def parse_funding(article):
                 i += 1
             if article[i].isspace():
                 i += 1
+            if article[i].lower() == 'k':
+                return round(float(funding) * 1000)
             if article[i].lower() == 'm':
                 return round(float(funding) * 1000000)
             if article[i].lower() == 'b':
