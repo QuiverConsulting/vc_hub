@@ -299,12 +299,13 @@ def insert_db(articles, next_scrape_date: datetime):
         collection.create_index('date')
         upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
         result = collection.bulk_write(upserts)
-        collection = db[DB_EXPIRY_DATE_COLLECTION]
-        collection.update_one({"title": "expiry_date"}, {"$set": {'expiry_date': next_scrape_date}}, upsert=True)
-        logging.debug(f"Updated expiry date in db to {next_scrape_date}.")
         logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
-
-
+        try:
+            collection = db[DB_EXPIRY_DATE_COLLECTION]
+            collection.update_one({"title": "expiry_date"}, {"$set": {'expiry_date': next_scrape_date}}, upsert=True)
+            logging.info(f"Updated expiry date in db to {next_scrape_date}.")
+        except Exception as ex:
+            logging.error(f"Error updating expiry date to {next_scrape_date}: {ex}")
     except Exception as e:
         logging.error(f"Error while inserting to db: {e}\n articles: {articles}.")
     finally:
