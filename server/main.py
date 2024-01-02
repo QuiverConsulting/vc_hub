@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import datetime
 from dotenv import load_dotenv
+
 load_dotenv()
 
 app = FastAPI()
@@ -36,9 +37,11 @@ def populateDb():
     except Exception as e:
         logging.error(f"Error while scraping data: {e}")
 
-@app.get("/wake_up")
+
+@app.get("/wake_up", include_in_schema=False)
 async def root():
     return "Container woken up successfully"
+
 
 @app.on_event("startup")
 async def schedule_periodic():
