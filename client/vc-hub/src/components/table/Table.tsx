@@ -85,6 +85,7 @@ const Table = () => {
         </ProgressWrapper>
       ) : (
           <div>
+            <p>Daily updated list of VC funded companies.</p>
             <p>Last Updated on {lastUpdated ? lastUpdated.toDateString() : "unknown"}.</p>
             <MaterialReactTable table={table} />
           </div>

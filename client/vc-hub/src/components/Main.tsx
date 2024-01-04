@@ -14,7 +14,6 @@ const Main = () => {
     <>
       <Header>VC HUB</Header>
       <Content>
-        <p>Daily updated list of VC funded companies.</p>
         <Table />
       </Content>
     </>
