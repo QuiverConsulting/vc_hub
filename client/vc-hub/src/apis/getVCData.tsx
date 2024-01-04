@@ -33,13 +33,19 @@ async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, 
   async function getVCData() {
     console.log("getting data...");
     const url = process.env.REACT_APP_VC_HUB_URL
-    const retriesNum = process.env.REACT_APP_API_MAX_RETRIES_NUM ? parseInt(process.env.REACT_APP_API_MAX_RETRIES_NUM): 5
-    const delay = process.env.REACT_APP_API_RETRY_DELAY_MILLI ? parseInt(process.env.REACT_APP_API_RETRY_DELAY_MILLI): 3000
-    const dataRaw: VCData | null = await fetchWithRetries(url??"", retriesNum, delay, [404])
-    if (dataRaw)
+    if (url)
     {
-     return dataRaw
-    }  
+        const retriesNum = process.env.REACT_APP_API_MAX_RETRIES_NUM ? parseInt(process.env.REACT_APP_API_MAX_RETRIES_NUM): 5
+        const delay = process.env.REACT_APP_API_RETRY_DELAY_MILLI ? parseInt(process.env.REACT_APP_API_RETRY_DELAY_MILLI): 3000
+        const dataRaw: VCData | null = await fetchWithRetries(url, retriesNum, delay, [404])
+        if (dataRaw)
+        {
+         return dataRaw
+        }  
+    }
+    else{
+        console.error("get vc data url not found.")
+    }
     return {articles:[], expiry_date: null} as VCData
 }
 
