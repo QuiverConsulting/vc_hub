@@ -20,11 +20,7 @@ const Table = () => {
   const [articles, setArticles] = useState<Article[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   let expiryDate = localStorage.getItem("expiryDate")
-  let lastUpdated = null
-  if (expiryDate !== null){
-    lastUpdated = new Date()
-    lastUpdated.setDate(new Date(expiryDate).getDate() - 1);
-  }
+
   useEffect(() => {
     (async () => {
       const expiry = localStorage.getItem("expiryDate");
@@ -84,11 +80,13 @@ const Table = () => {
           <LinearProgress />
         </ProgressWrapper>
       ) : (
-          <div>
+          <>
             <p>Daily updated list of VC funded companies.</p>
-            <p>Last Updated on {lastUpdated ? lastUpdated.toDateString() : "unknown"}.</p>
+            {expiryDate &&  (
+              <p>Last Updated on {moment(expiryDate).subtract(1, "days").local().format('dddd MMM DD YYYY')}.</p>
+            )}    
             <MaterialReactTable table={table} />
-          </div>
+          </>
       )}
     </>
   );
