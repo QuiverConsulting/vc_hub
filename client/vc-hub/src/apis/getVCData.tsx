@@ -5,10 +5,8 @@ function timeout(delay: number) {
 }
 
 
-async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, retryErrorCodes: number[]) {
+async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, retryErrorCodes: number[], emptyData: any) {
     let currentRetry = 0;
-    const emptyData: VCData = {articles:[], expiry_date: null}
-  
     while (currentRetry < retriesNum) {
 
         const response = await fetch(url);
@@ -37,7 +35,7 @@ async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, 
     const url = process.env.REACT_APP_VC_HUB_URL
     const retriesNum = process.env.REACT_APP_API_MAX_RETRIES_NUM ? parseInt(process.env.REACT_APP_API_MAX_RETRIES_NUM): 5
     const delay = process.env.REACT_APP_API_RETRY_DELAY_MILLI ? parseInt(process.env.REACT_APP_API_RETRY_DELAY_MILLI): 3000
-    return fetchWithRetries(url??"", retriesNum, delay, [404]) 
+    return fetchWithRetries(url??"", retriesNum, delay, [404], {articles:[], expiry_date: null} as VCData)
 
 }
 

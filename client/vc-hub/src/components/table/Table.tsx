@@ -5,7 +5,7 @@ import {
   useMaterialReactTable,
 } from "material-react-table";
 import getVCData from "../../apis/getVCData";
-import { Article } from "../../Interfaces";
+import { Article, VCData } from "../../Interfaces";
 import tableColumns from "./TableColumns";
 import styled from "styled-components";
 import { LinearProgress } from "@mui/material";
@@ -24,7 +24,7 @@ const Table = () => {
     (async () => {
       const expiry = localStorage.getItem("expiryDate");
       if (expiry === null || (expiry !== null && moment(expiry).isBefore(moment()))) {
-       const data = await getVCData();
+       const data: VCData = await getVCData();
        localStorage.setItem('articles', JSON.stringify(data.articles));
        if (data.expiry_date)
        {
