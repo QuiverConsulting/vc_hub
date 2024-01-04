@@ -19,7 +19,8 @@ const ProgressWrapper = styled.div`
 const Table = () => {
   const [articles, setArticles] = useState<Article[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  let expiryDate = localStorage.getItem("expiryDate")
+  const [expiryDate, setExpiryDate] = useState<string>("");
+  
 
   useEffect(() => {
     (async () => {
@@ -29,7 +30,9 @@ const Table = () => {
        localStorage.setItem('articles', JSON.stringify(data.articles));
        if (data.expiry_date)
        {
-         localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
+         const expiryString = new Date(data.expiry_date).toISOString();
+         localStorage.setItem('expiryDate',  expiryString);
+         setExpiryDate(expiryString)
        }
        const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
        setArticles(articlesSorted);
@@ -37,8 +40,10 @@ const Table = () => {
       else {
         const localArticles = localStorage.getItem("articles");
         if (localArticles) setArticles(JSON.parse(localArticles));
+        setExpiryDate(expiry)
       }
       setIsLoading(false);
+      
     })();
   
   }, []);
