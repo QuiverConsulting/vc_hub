@@ -23,7 +23,7 @@ const Table = () => {
   let lastUpdated = null
   if (expiryDate !== null){
     lastUpdated = new Date()
-    lastUpdated.setDate(new Date(expiryDate).getDate() - 1); 
+    lastUpdated.setDate(new Date(expiryDate).getDate() - 1);
   }
   useEffect(() => {
     (async () => {
@@ -85,7 +85,7 @@ const Table = () => {
         </ProgressWrapper>
       ) : (
           <div>
-            <p>Last Updated on {lastUpdated ? lastUpdated.toString() : "unknown"}.</p>
+            <p>Last Updated on {lastUpdated ? lastUpdated.toDateString() : "unknown"}.</p>
             <MaterialReactTable table={table} />
           </div>
       )}
