@@ -19,7 +19,12 @@ const ProgressWrapper = styled.div`
 const Table = () => {
   const [articles, setArticles] = useState<Article[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  let expiryDate = localStorage.getItem("expiryDate")
+  let lastUpdated = null
+  if (expiryDate !== null){
+    lastUpdated = new Date()
+    lastUpdated.setDate(new Date(expiryDate).getDate() - 1); 
+  }
   useEffect(() => {
     (async () => {
       const expiry = localStorage.getItem("expiryDate");
@@ -79,7 +84,10 @@ const Table = () => {
           <LinearProgress />
         </ProgressWrapper>
       ) : (
-          <MaterialReactTable table={table} />
+          <div>
+            <p>Last Updated on {lastUpdated ? lastUpdated.toString() : "unknown"}.</p>
+            <MaterialReactTable table={table} />
+          </div>
       )}
     </>
   );
