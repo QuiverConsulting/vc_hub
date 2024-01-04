@@ -4,26 +4,41 @@ function timeout(delay: number) {
     return new Promise( res => setTimeout(res, delay) );
 }
 
-function getVCData(retries = 5): Promise<VCData> {
+
+async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, retryErrorCodes: number[]) {
+    let currentRetry = 0;
+    const emptyData: VCData = {articles:[], expiry_date: null}
+  
+    while (currentRetry < retriesNum) {
+
+        const response = await fetch(url);
+        if (response.ok) 
+        {
+          return await response.json() as VCData;
+        }
+        else if (retryErrorCodes.includes(response.status)) 
+        {
+          currentRetry++;
+          console.log(`${url} responded with ${response.status}, retrying in ${delayMilli/1000} seconds. Retrying ${currentRetry} out of ${retriesNum} trys.`);
+          await timeout(delayMilli);
+        } 
+        else 
+        {
+            console.error(`Unable to get data from ${url}, responded with ${response.status}.`);
+            return emptyData
+        }
+    }
+    console.error(`Unable to get data from ${url}, retried ${retriesNum} times.`);
+    return emptyData
+  }
+
+  function getVCData() {
     console.log("getting data...");
     const url = process.env.REACT_APP_VC_HUB_URL
-    return fetch(url??"")
-        .then(async function(response) {
-            if (response.ok) {
-                return response.json();
-            }
-            console.log("Failed to get data, waiting for 3 seconds before retry.");
-            await timeout(3000); //for 3 sec delay
-            throw new Error("HTTP status " + response.status)
-        })
-        .then((res: VCData) => {return res})
-        .catch(error => {
-            if (retries <= 0) {
-                console.error(error) 
-                return [] as unknown as VCData
-            }
-            return getVCData(retries - 1);
-        });
-    }
+    const retriesNum = process.env.REACT_APP_API_MAX_RETRIES_NUM ? parseInt(process.env.REACT_APP_API_MAX_RETRIES_NUM): 5
+    const delay = process.env.REACT_APP_API_RETRY_DELAY_MILLI ? parseInt(process.env.REACT_APP_API_RETRY_DELAY_MILLI): 3000
+    return fetchWithRetries(url??"", retriesNum, delay, [404]) 
+
+}
 
 export default getVCData;

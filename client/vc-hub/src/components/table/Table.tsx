@@ -21,24 +21,27 @@ const Table = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const expiry = localStorage.getItem("expiryDate");
-
-    if (expiry === null || (expiry !== null && moment(expiry).isBefore(moment()))) {
-      getVCData()?.then((data)=> {
-        localStorage.setItem('articles', JSON.stringify(data.articles));
-        if (data.expiry_date)
-        {
-          localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
-        }
-        const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
-        setArticles(articlesSorted);
-      });
-    } else {
-      const localArticles = localStorage.getItem("articles");
-      if (localArticles) setArticles(JSON.parse(localArticles));
-    }
-    setIsLoading(false);
+    (async () => {
+      const expiry = localStorage.getItem("expiryDate");
+      if (expiry === null || (expiry !== null && moment(expiry).isBefore(moment()))) {
+       const data = await getVCData();
+       localStorage.setItem('articles', JSON.stringify(data.articles));
+       if (data.expiry_date)
+       {
+         localStorage.setItem('expiryDate',  new Date(data.expiry_date).toISOString());
+       }
+       const articlesSorted = data.articles?.sort((a,b)=> b.date && a.date && moment(a.date).isAfter(moment(b.date))? -1:1)
+       setArticles(articlesSorted);
+      }
+      else {
+        const localArticles = localStorage.getItem("articles");
+        if (localArticles) setArticles(JSON.parse(localArticles));
+      }
+      setIsLoading(false);
+    })();
+  
   }, []);
+
 
   const table = useMaterialReactTable({
     columns: tableColumns,
