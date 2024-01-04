@@ -36,12 +36,11 @@ async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, 
     const retriesNum = process.env.REACT_APP_API_MAX_RETRIES_NUM ? parseInt(process.env.REACT_APP_API_MAX_RETRIES_NUM): 5
     const delay = process.env.REACT_APP_API_RETRY_DELAY_MILLI ? parseInt(process.env.REACT_APP_API_RETRY_DELAY_MILLI): 3000
     const dataRaw: VCData | null = await fetchWithRetries(url??"", retriesNum, delay, [404])
-    let data: VCData = {articles:[], expiry_date: null}
     if (dataRaw)
     {
-     data = {...dataRaw}
+     return dataRaw
     }  
-    return data 
+    return {articles:[], expiry_date: null} as VCData
 }
 
 export default getVCData;
