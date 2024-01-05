@@ -11,11 +11,14 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
   {
     accessorKey: "fundingString",
     header: "Funding",
-    size: 100,
+    sortingFn: (rowA:any, rowB:any,columnId:any) =>{
+      return parseInt(rowA.getValue(columnId).substring(1).replace(/,/g, ''), 10)  < parseInt(rowB.getValue(columnId).substring(1).replace(/,/g, ''), 10) ? 1 : -1},
+    size: 100
   },
   {
     accessorKey: "location",
     header: "Location",
+    filterVariant: 'multi-select',
     size: 150,
   },
 

@@ -71,6 +71,9 @@ const Table = () => {
     rowNumberDisplayMode: "original",
     enableRowOrdering: true,
     enableFilterMatchHighlighting: true,
+    enableFacetedValues: true,
+    enableMultiSort: true,
+    isMultiSortEvent: () => true,
     muiTableBodyProps: {
       sx: (theme) => ({
      
