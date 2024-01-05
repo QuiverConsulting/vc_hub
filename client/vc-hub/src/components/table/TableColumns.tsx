@@ -16,6 +16,7 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
   {
     accessorKey: "funding",
     header: "Funding",
+    Cell: ({ cell }) => cell.getValue<number>().toLocaleString(), 
     size: 100,
   },
   {
