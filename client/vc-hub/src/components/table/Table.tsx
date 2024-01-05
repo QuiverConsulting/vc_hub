@@ -17,6 +17,13 @@ const ProgressWrapper = styled("div")(
 `
 );
 
+const DescriptionWrapper = styled("div")(
+  ({ theme }) => `
+  display:flex;
+  flex-direction: row;
+`
+);
+
 const Table = () => {
   const [articles, setArticles] = useState<Article[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -56,7 +63,7 @@ const Table = () => {
       density: "compact",
       pagination: { pageSize: 25, pageIndex: 0 },
     },
-    muiTableContainerProps: { sx: { maxHeight: "58vh" } },
+    muiTableContainerProps: { sx: { maxHeight: "63vh" } },
     enableStickyHeader: true,
     enableColumnOrdering: true,
     enableRowPinning: true,
@@ -89,17 +96,19 @@ const Table = () => {
         </ProgressWrapper>
       ) : (
         <>
-          <p>Daily updated list of VC funded companies.</p>
-          {expiryDate && (
-            <p>
-              Last Updated on{" "}
-              {moment(expiryDate)
-                .subtract(1, "days")
-                .local()
-                .format("dddd MMM DD YYYY")}
-              .
-            </p>
-          )}
+          <DescriptionWrapper>
+            <p>Daily updated list of VC funded companies.</p>
+            {expiryDate && (
+              <p>
+                &nbsp;Last Updated on{" "}
+                {moment(expiryDate)
+                  .subtract(1, "days")
+                  .local()
+                  .format("dddd MMM DD YYYY")}
+                .
+              </p>
+            )}
+          </DescriptionWrapper>
           <MaterialReactTable table={table} />
         </>
       )}
