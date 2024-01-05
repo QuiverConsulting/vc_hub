@@ -8,6 +8,7 @@ export interface Article {
   location: string | null;
   series: string | null;
   timestamp: Date | null;
+  fundingString?: string ;
 }
 
 export interface VCData {

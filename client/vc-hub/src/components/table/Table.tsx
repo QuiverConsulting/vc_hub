@@ -7,7 +7,7 @@ import {
 import getVCData from "../../apis/getVCData";
 import { Article } from "../../Interfaces";
 import tableColumns from "./TableColumns";
-import { LinearProgress, styled } from "@mui/material";
+import { LinearProgress, darken, styled } from "@mui/material";
 import moment from "moment";
 
 const ProgressWrapper = styled("div")(
@@ -37,7 +37,6 @@ const Table = () => {
         (expiry !== null && moment(expiry).isBefore(moment()))
       ) {
         const data = await getVCData();
-        localStorage.setItem("articles", JSON.stringify(data.articles));
         if (data.expiry_date) {
           const expiryString = new Date(data.expiry_date).toISOString();
           localStorage.setItem("expiryDate", expiryString);
@@ -45,7 +44,8 @@ const Table = () => {
         }
         const articlesSorted = data.articles?.sort((a, b) =>
           b.date && a.date && moment(a.date).isAfter(moment(b.date)) ? -1 : 1
-        );
+        ).map((a)=>({...a, 'fundingString': a.currency && a.funding ? a.currency.concat(a.funding.toLocaleString()): ""}));
+        localStorage.setItem("articles", JSON.stringify(articlesSorted));
         setArticles(articlesSorted);
       } else {
         const localArticles = localStorage.getItem("articles");
@@ -70,6 +70,19 @@ const Table = () => {
     enableRowNumbers: true,
     rowNumberDisplayMode: "original",
     enableRowOrdering: true,
+    enableFilterMatchHighlighting: true,
+    muiTableBodyProps: {
+      sx: (theme) => ({
+     
+        '& tr:nth-of-type(odd) > td': {
+          backgroundColor: theme.palette.text.secondary,
+        },
+        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]):hover > td': {
+          backgroundColor: darken(theme.palette.text.secondary, 0.2),
+        },
+      }),
+    },
+
     mrtTheme: (theme) => ({
       baseBackgroundColor: theme.palette.primary.contrastText,
     }),

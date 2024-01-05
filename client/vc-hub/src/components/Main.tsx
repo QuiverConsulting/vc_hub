@@ -16,6 +16,7 @@ const darkTheme = createTheme({
     },
     text:{
       primary:'#e3f2fd',
+      secondary: '#424242'
     }
   },
 });
@@ -23,7 +24,11 @@ const darkTheme = createTheme({
 const lightTheme = createTheme({
   palette: {
     mode: "light",
+    text:{
+      secondary: '#d8e3ee'
+    }
   },
+  
 });
 
 const Content = styled("div")(({ theme }) => ({

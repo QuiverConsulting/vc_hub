@@ -72,7 +72,6 @@ interface Props {
 
 const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
-  console.log(isLightTheme)
   return (
     <>
       <AppBar position="static">
