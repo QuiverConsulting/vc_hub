@@ -1,9 +1,9 @@
-import { AppBar, Switch, Theme, styled } from "@mui/material";
+import { AppBar, Switch, styled } from "@mui/material";
 import moon from "./../assets/moon.png";
 import sun from "./../assets/sun.png";
 import { Dispatch, FC, SetStateAction } from "react";
 
-const HeaderWrapper = styled("h2")(
+const HeaderWrapper = styled("div")(
   ({ theme }) => `
   color: ${theme.palette.primary.light};
   display: flex;
@@ -60,7 +60,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
   "& .MuiSwitch-track": {
     opacity: 1,
-    backgroundColor: theme.palette.grey[400],
+    backgroundColor: theme.palette.grey[200],
     borderRadius: 20 / 2,
   },
 }));
@@ -75,7 +75,7 @@ const Header: FC<Props> = ({ setIsLightTheme }) => {
     <>
       <AppBar position="static">
         <HeaderWrapper>
-          <p>VC HUB</p>
+          <h2>VC HUB</h2>
           <MaterialUISwitch
             {...label}
             className="toggle"

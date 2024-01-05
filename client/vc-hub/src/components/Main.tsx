@@ -7,6 +7,13 @@ import { useEffect, useState } from "react";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
+    primary: {
+      main: '#e3f2fd',
+      contrastText: '#131111',
+    },
+    background:{
+      default: '#0a0a0a'
+    }
   },
 });
 
