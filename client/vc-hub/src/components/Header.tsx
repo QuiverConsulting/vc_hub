@@ -67,10 +67,12 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 
 interface Props {
   setIsLightTheme: Dispatch<SetStateAction<boolean>>;
+  isLightTheme: boolean;
 }
 
-const Header: FC<Props> = ({ setIsLightTheme }) => {
+const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
+  console.log(isLightTheme)
   return (
     <>
       <AppBar position="static">
@@ -79,6 +81,7 @@ const Header: FC<Props> = ({ setIsLightTheme }) => {
           <MaterialUISwitch
             {...label}
             className="toggle"
+            defaultChecked={!isLightTheme}
             onClick={() => {
               setIsLightTheme((prev) => !prev);
             }}

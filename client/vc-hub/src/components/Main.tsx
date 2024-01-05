@@ -31,17 +31,19 @@ const Content = styled("div")(({ theme }) => ({
 }));
 
 const Main = () => {
-  const [theme, setTheme] = useState(lightTheme);
-  const [isLightTheme, setIsLightTheme] = useState(true);
+  const localIsLightTheme = localStorage.getItem("isLightTheme")
+  const [theme, setTheme] = useState(localIsLightTheme ===null || localIsLightTheme ==="true"?lightTheme:darkTheme );
+  const [isLightTheme, setIsLightTheme] = useState<boolean>(localIsLightTheme ===null || localIsLightTheme ==="true"?true:false );
 
   useEffect(() => {
-    isLightTheme ? setTheme(lightTheme) : setTheme(darkTheme);
+      localStorage.setItem("isLightTheme", isLightTheme.toString())
+      isLightTheme ? setTheme(lightTheme) : setTheme(darkTheme);
   }, [isLightTheme]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header setIsLightTheme={setIsLightTheme} />
+      <Header setIsLightTheme={setIsLightTheme} isLightTheme={isLightTheme}/>
       <Content>
         <Table />
       </Content>
