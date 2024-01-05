@@ -1,22 +1,41 @@
-import styled from "styled-components";
+import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import Table from "./table/Table";
+import Header from "./Header";
+import { useEffect, useState } from "react";
 
-const Header = styled.h1`
-  color: blue;
-  text-align: center;
-`;
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
-const Content = styled.div`
-  margin: 3rem;
-`;
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
+
+const Content = styled("div")(({ theme }) => ({
+  margin: "3rem",
+}));
+
 const Main = () => {
+  const [theme, setTheme] = useState(lightTheme);
+  const [isLightTheme, setIsLightTheme] = useState(true);
+
+  useEffect(() => {
+    isLightTheme ? setTheme(lightTheme) : setTheme(darkTheme);
+  }, [isLightTheme]);
+
   return (
-    <>
-      <Header>VC HUB</Header>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Header setIsLightTheme={setIsLightTheme} />
       <Content>
         <Table />
       </Content>
-    </>
+    </ThemeProvider>
   );
 };
 
