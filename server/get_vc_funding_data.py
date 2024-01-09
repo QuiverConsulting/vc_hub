@@ -37,5 +37,5 @@ def get_funding_data():
         return entries
 
 
-if __name__ == '__main__':
-    logging.info(len(get_funding_data()))
+# if __name__ == '__main__':
+#     logging.info(len(get_funding_data()))
