@@ -265,7 +265,7 @@ def parse_financiers(data):
 def parse_location(data):
     locations = []
     for entry in data:
-        if entry['entity_group'] == 'LOC':
+        if entry['entity_group'] == 'LOC' and entry['word'].isalpha():
             locations.append(entry['word'])
 
     if len(locations) == 0:
