@@ -167,7 +167,7 @@ def parse_html(html_data, site):
             articles = parse_articles(soup, "article", ["herald-lay-a", "herald-lay-c", "herald-lay-f"],
                                       date_class="updated")
         case Sites.EUSTARTUPS.value:
-            articles = parse_articles(soup, "div", "td-animation-stack", "time")
+            articles = parse_articles(soup, "div", "td-animation-stack", "time",None,"td-image-wrap")
         case Sites.SIFTED.value:
             articles = parse_articles(soup, "li", "m-0",
                                       date_class="whitespace-nowrap text-[14px] leading-4 text-[#5b5b5b]")
@@ -299,7 +299,7 @@ def insert_db(articles, next_scrape_date: datetime):
         db = client[DB_NAME]
         collection = db[DB_FUNDING_COLLECTION]
         collection.create_index('date')
-        upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name'], 'date': a['date']}, {'$setOnInsert': a}, upsert=True) for a in articles]
+        upserts = [UpdateOne({'link': a['link'], 'company_name': a['company_name']}, {'$setOnInsert': a}, upsert=True) for a in articles]
         result = collection.bulk_write(upserts)
         logging.info(f"Inserted {result.upserted_count} records into db. Found {result.matched_count} duplicate records.")
         try:
@@ -315,6 +315,6 @@ def insert_db(articles, next_scrape_date: datetime):
 
 # if __name__ == '__main__':
 #     try:
-#         insert_db(scrape())
+#         insert_db(scrape(),datetime.now())
 #     except Exception as e:
 #         logging.error(f"Error while scraping data: {e}")
