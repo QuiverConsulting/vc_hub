@@ -24,7 +24,7 @@ def get_funding_data():
         collection = db[DB_FUNDING_COLLECTION]
         logging.info("Successfully connected to db")
         collection.create_index('date')
-        data = list(collection.find({},{"_id":0}).sort({ "date": -1}).limit(int(NUM_FUNDING_ENTRIES)))
+        data = list(collection.find({"company_name": {"$ne": None}},{"_id":0}).sort({ "date": -1}).limit(int(NUM_FUNDING_ENTRIES)))
         collection = db[DB_EXPIRY_DATE_COLLECTION]
         expiry_date = collection.find_one({"title": "expiry_date"}, {'_id': 0})
         entries = {'articles': data, 'expiry_date': expiry_date['expiry_date']}
@@ -36,5 +36,6 @@ def get_funding_data():
         logging.info("Returning info to FASTAPI")
         return entries
 
-# if __name__ == '__main__':
-#     logging.info(len(get_funding_data()))
+
+if __name__ == '__main__':
+    logging.info(len(get_funding_data()))
