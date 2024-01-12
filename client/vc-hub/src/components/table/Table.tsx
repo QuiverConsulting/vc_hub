@@ -42,14 +42,21 @@ const Table = () => {
           localStorage.setItem("expiryDate", expiryString);
           setExpiryDate(expiryString);
         }
-        const articlesSorted = data.articles?.sort((a, b) =>
+        if(data.articles !== null)
+        {
+          const articlesSorted = data.articles?.sort((a, b) =>
           b.date && a.date && moment(a.date).isAfter(moment(b.date)) ? -1 : 1
-        ).map((a)=>({...a, 'fundingString': a.currency && a.funding ? a.currency.concat(a.funding.toLocaleString()): ""}));
-        localStorage.setItem("articles", JSON.stringify(articlesSorted));
-        setArticles(articlesSorted);
+          ).map((a)=>({...a, 'fundingString': a.currency && a.funding ? a.currency.concat(a.funding.toLocaleString()): ""}));
+          localStorage.setItem("articles", JSON.stringify(articlesSorted));
+          setArticles(articlesSorted);
+        }
+        else{
+          const localArticles = localStorage.getItem("articles");
+          setArticles(localArticles?JSON.parse(localArticles):[]);
+        }
       } else {
         const localArticles = localStorage.getItem("articles");
-        if (localArticles) setArticles(JSON.parse(localArticles));
+        setArticles(localArticles?JSON.parse(localArticles):[]);
         setExpiryDate(expiry);
       }
       setIsLoading(false);
