@@ -12,7 +12,7 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
     accessorKey: "fundingString",
     header: "Funding",
     sortingFn: (rowA:any, rowB:any,columnId:any) =>{
-      return parseInt(rowA.getValue(columnId).substring(1).replace(/,/g, ''), 10)  < parseInt(rowB.getValue(columnId).substring(1).replace(/,/g, ''), 10) ? 1 : -1},
+      return parseInt(rowA.getValue(columnId).substring(1).replace(/,/g, '').replace(",","") , 10) < parseInt(rowB.getValue(columnId).substring(1).replace(/,/g, '').replace(",","") , 10) ? 1 : -1},
     size: 100
   },
   {
