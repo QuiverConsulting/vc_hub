@@ -279,7 +279,7 @@ def parse_funding(article):
     for i in range(0, len(article)):
         if article[i] in currencies:
             i += 1
-            while article[i].isdigit() or article[i] == '.':
+            while article[i].isdigit() or article[i] == '.' or article[i] == ',':
                 funding += article[i]
                 i += 1
             if article[i].isspace():
