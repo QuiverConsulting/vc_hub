@@ -26,7 +26,7 @@ DB_NAME = os.getenv('DB_NAME')
 DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
 DB_EXPIRY_DATE_COLLECTION = os.getenv('DB_EXPIRY_DATE_COLLECTION')
 
-currencies = ["$", "€", "£", "¥"]
+currencies = {"$", "€", "£", "¥"}
 
 class Article(BaseModel):
     company_name: Optional[str]
@@ -193,6 +193,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 location = parse_location(data)  # Get location
                 financiers = parse_financiers(data)  # Get list of financiers
                 funding = parse_funding(article.text)
+                series = parse_series((article.text.lower()))
 
                 date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
                 if date_tag == 'time':
@@ -204,7 +205,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 link = link_parsed['href']
 
                 a = Article(link=link, date=date,
-                            company_name=company_name, series=None, location=location,
+                            company_name=company_name, series=series, location=location,
                             funding=funding, financiers=financiers, currency=character)
                 article_set.add(a)
 
@@ -292,6 +293,12 @@ def parse_funding(article):
                 return round(float(funding) * 1000000000)
             return round(float(funding))
 
+def parse_series(article):
+    if " seed " in article:
+        return "Seed"
+    elif " series " in article:
+        return "Series " + article[article.index(" series ")+8].upper()
+    return None
 
 def insert_db(articles, next_scrape_date: datetime):
     client = MongoClient(MONGO_CONNECTION_STR)
