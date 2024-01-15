@@ -8,23 +8,29 @@ function timeout(delay: number) {
 async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, retryErrorCodes: number[]) {
     let currentRetry = 0;
     while (currentRetry < retriesNum) {
-
-        const response = await fetch(url);
-        if (response.ok) 
-        {
-          return await response.json();
+        try{
+          const response = await fetch(url);
+          if (response.ok) 
+          {
+            return await response.json();
+          }
+          else if (retryErrorCodes.includes(response.status)) 
+          {
+            currentRetry++;
+            console.log(`${url} responded with ${response.status}, retrying in ${delayMilli/1000} seconds. Retrying ${currentRetry} out of ${retriesNum} trys.`);
+            await timeout(delayMilli);
+          } 
+          else 
+          {
+              console.error(`Unable to get data from ${url}, responded with ${response.status}.`);
+              return null
+          }
         }
-        else if (retryErrorCodes.includes(response.status)) 
-        {
-          currentRetry++;
-          console.log(`${url} responded with ${response.status}, retrying in ${delayMilli/1000} seconds. Retrying ${currentRetry} out of ${retriesNum} trys.`);
-          await timeout(delayMilli);
-        } 
-        else 
-        {
-            console.error(`Unable to get data from ${url}, responded with ${response.status}.`);
-            return null
+        catch(e){
+          console.error(`Something went wrong while fetching vc data: ${e}`)
+          return null;
         }
+ 
     }
     console.error(`Unable to get data from ${url}, retried ${retriesNum} times.`);
     return null
@@ -46,7 +52,7 @@ async function fetchWithRetries(url: string, retriesNum = 5, delayMilli = 3000, 
     else{
         console.error("get vc data url not found.")
     }
-    return {articles:[], expiry_date: null} as VCData
+    return {articles:null, expiry_date: null} as VCData
 }
 
 export default getVCData;
