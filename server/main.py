@@ -49,4 +49,4 @@ async def schedule_periodic():
     app.scheduler.add_job(populateDb, 'cron', hour=os.getenv('CRON_HOUR'), minute="0")
     app.scheduler.start()
     for job in app.scheduler.get_jobs():
-        logging.info("Scraper will run next at: " + job.next_run_time)
+        logging.info(f"Scraper will run next at: {job.next_run_time}")
