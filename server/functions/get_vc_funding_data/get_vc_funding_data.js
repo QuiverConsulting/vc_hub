@@ -23,6 +23,8 @@ const handler = async (event) => {
     const expiry_date = await collection.findOne({"title": "expiry_date"}, {'_id': 0})
     const entries = {'articles': results, 'expiry_date': expiry_date.expiry_date}
 
+    client.close()
+
   return {
     statusCode: 200,
     body: JSON.stringify(entries),
