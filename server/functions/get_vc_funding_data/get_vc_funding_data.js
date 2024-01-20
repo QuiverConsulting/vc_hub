@@ -12,18 +12,23 @@ const handler = async (event) => {
     return { statusCode: 500, body: e.toString() };
   }
   const db = conn.db(process.env.DB_NAME);
-  const collection = await db.collection(process.env.DB_FUNDING_COLLECTION);
+  let collection = db.collection(process.env.DB_FUNDING_COLLECTION);
   const results = await collection
     .find({ company_name: { $ne: null } }, { _id: 0 })
     .sort({ date: -1 })
     .limit(parseInt(process.env.NUM_FUNDING_ENTRIES) || 1500)
     .toArray();
 
+    collection = db.collection(process.env.DB_EXPIRY_DATE_COLLECTION);
+    const expiry_date = await collection.findOne({"title": "expiry_date"}, {'_id': 0})
+    const entries = {'articles': results, 'expiry_date': expiry_date.expiry_date}
+
   return {
     statusCode: 200,
-    body: JSON.stringify(results),
+    body: JSON.stringify(entries),
     headers: {
-			'Content-Type': 'application/json; charset=utf-8'
+			'Content-Type': 'application/json; charset=utf-8',
+      'Access-Control-Allow-Origin': '*'
 		},
   };
 };
