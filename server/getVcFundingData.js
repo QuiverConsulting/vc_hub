@@ -16,6 +16,8 @@ let db = conn.db(process.env.DB_NAME);
 
 const api = express();
 const router = Router();
+api.use("/.netlify/functions/server", router);
+
 router.get("/vc_funding_data", async (req, res) =>
 {
     let collection = await db.collection(process.env.DB_FUNDING_COLLECTION);
@@ -26,11 +28,12 @@ router.get("/vc_funding_data", async (req, res) =>
   res.send(results).status(200);
 } );
 
-api.use("/api/", router);
+
 
 // const port = 8000
 // api.listen(port, () => {
 //     console.log(`Example app listening on port ${port}`)
 //   })
 
-export const handler = serverless(api);
+module.exports = api
+module.exports.handler = serverless(api)
