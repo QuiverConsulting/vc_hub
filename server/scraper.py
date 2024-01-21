@@ -27,9 +27,11 @@ DB_FUNDING_COLLECTION = os.getenv('DB_FUNDING_COLLECTION')
 DB_EXPIRY_DATE_COLLECTION = os.getenv('DB_EXPIRY_DATE_COLLECTION')
 
 currencies = {"$", "€", "£", "¥"}
+keywords = {" raise ", " nabs ", " snaps ", " extends ", " raises ", " raised ", " secured ", " secures ", " receieves ", " received ", " closes ", " closed "}
 
 class Article(BaseModel):
     company_name: Optional[str]
+    company_score: Optional[float]
     currency: Optional[str]
     funding: Optional[int]
     location: Optional[str]
@@ -40,11 +42,12 @@ class Article(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now)
 
     def __hash__(self):
-        return hash((self.company_name, self.currency, self.funding, self.location, self.series, self.date, self.link, str(self.financiers)))
+        return hash((self.company_name, self.company_score, self.currency, self.funding, self.location, self.series, self.date, self.link, str(self.financiers)))
 
     def __eq__(self, other):
         return (
             self.company_name == other.company_name and
+            self.company_score == other.company_score and
             self.currency == other.currency and
             self.funding == other.funding and
             self.location == other.location and
@@ -128,7 +131,7 @@ def geekwire_airtable_scrape():
             'cellValuesByColumnId'] else None
 
         a = Article(company_name=company_name, funding=funding, series=series, financiers=financiers, link=link,
-                    date=date, currency='$', location='USA')
+                    date=date, currency='$', location='USA', company_score=None)
         articles.append(a.model_dump())
     logging.debug(f"Got {len(articles)} articles from geekwire's airtable: {articles}")
     return articles
@@ -187,29 +190,42 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
     articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
     for article in articles_parsed:
         for character in article.text:
-            if character in currencies:  # Only parse articles that have currency in content
-                data = tokenize(article.text)  # Run article text through NER model
-                company_name = parse_orgs(data)  # Get company name
-                location = parse_location(data)  # Get location
-                financiers = parse_financiers(data)  # Get list of financiers
-                funding = parse_funding(article.text)
-                series = parse_series((article.text.lower()))
+            if character in currencies and any(keyWord in article.text.lower() for keyWord in keywords):  # Only parse articles that have currency in content
+                # if any(keyWord in article.text.lower() for keyWord in keywords):
 
-                date_parse = article.findNext(**{k: v for k, v in kwargs_date.items() if v is not None})
-                if date_tag == 'time':
-                    date = parser.parse(date_parse['datetime'])
-                else:
-                    date = datetime.strptime(date_parse.text, "%B %d, %Y")
+                try:
+                    data = tokenize(article.text)  # Run article text through NER model
+                    company = parse_orgs(data)
+                    company_name = company[0]  # Get company name
+                    company_score = company[1]
+                    location = parse_location(data)  # Get location
+                    financiers = parse_financiers(data)  # Get list of financiers
+                    funding = parse_funding(article.text)
+                    series = parse_series((article.text.lower()))
 
-                link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
-                link = link_parsed['href']
+                    date_parse = article.findNext( ** {k: v
+                    for k, v in kwargs_date.items() if v is not None})
+                    if date_tag == 'time':
+                        date = parser.parse(date_parse['datetime'])
+                    else:
+                        date = datetime.strptime(date_parse.text, "%B %d, %Y")
 
-                a = Article(link=link, date=date,
-                            company_name=company_name, series=series, location=location,
-                            funding=funding, financiers=financiers, currency=character)
-                article_set.add(a)
+                    link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
+                    link = link_parsed['href']
 
+                    a = Article(link=link, date=date,
+                                company_name=company_name, series=series, location=location,
+                                funding=funding, financiers=financiers, currency=character, company_score = company_score)
+                    article_set.add(a)
+                except Exception as e:
+                    logging.error(e)
+                    logging.error(f"The following article caused an error: {article.text}")
                 break  # Prevent re-running for every character in for loop if ran once
+
+
+
+
+
     article_list = []
     for article in article_set:
         article_list.append(article.model_dump())
@@ -230,14 +246,18 @@ def tokenize(article):
 
 def parse_orgs(data):
     orgs = []
+    score = 0
     for entry in data:
-        if entry['entity_group'] == 'ORG' and re.match(r'([\w\s]+)', entry['word']) and not isVC(entry['word']):
+        if entry['entity_group'] == 'ORG' and re.match(r'([\w\s]+)', entry['word']) and not isVC(entry['word']) and score < entry['score']:
+            orgs.clear()
             orgs.append(entry['word'])
+            orgs.append(entry['score'])
+            score = entry['score']
 
     if len(orgs) == 0:
-        return None
+        return [None,None]
 
-    return orgs[0]  # TODO: Figure out how to handle multiple orgs that aren't investors
+    return orgs  # TODO: Figure out how to handle multiple orgs that aren't investors
 
 
 def isVC(organization):
