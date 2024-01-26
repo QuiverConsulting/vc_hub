@@ -192,22 +192,54 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 # if any(keyWord in article.text.lower() for keyWord in keywords):
 
                 try:
-                    data = tokenize(article.text)  # Run article text through NER model
-                    company_name = parse_orgs(data)  # Get company name
-                    location = parse_location(data)  # Get location
-                    financiers = parse_financiers(data)  # Get list of financiers
-                    funding = parse_funding(article.text)
-                    series = parse_series((article.text.lower()))
+                    try:
+                        data = tokenize(article.text)  # Run article text through NER model
+                    except Exception as e:
+                        logging.error("Tokenization failed")
+                        raise Exception(e)
+                    try:
+                        company_name = parse_orgs(data)  # Get company name
+                    except Exception as e:
+                        logging.error("Company name failed")
+                        raise Exception(e)
+                    try:
+                        location = parse_location(data)  # Get location
+                    except Exception as e:
+                        logging.error("Location failed")
+                        raise Exception(e)
+                    try:
+                        financiers = parse_financiers(data)  # Get list of financiers
+                    except Exception as e:
+                        logging.error("Financiers failed")
+                        raise Exception(e)
+                    try:
+                        funding = parse_funding(article.text)
+                    except Exception as e:
+                        logging.error("Funding failed")
+                        raise Exception(e)
+                    try:
+                        series = parse_series((article.text.lower()))
+                    except Exception as e:
+                        logging.error("Series failed")
+                        raise Exception(e)
 
-                    date_parse = article.findNext( ** {k: v
-                    for k, v in kwargs_date.items() if v is not None})
-                    if date_tag == 'time':
-                        date = parser.parse(date_parse['datetime'])
-                    else:
-                        date = datetime.strptime(date_parse.text, "%B %d, %Y")
+                    try:
+                        date_parse = article.findNext( ** {k: v
+                        for k, v in kwargs_date.items() if v is not None})
+                        if date_tag == 'time':
+                            date = parser.parse(date_parse['datetime'])
+                        else:
+                            date = datetime.strptime(date_parse.text, "%B %d, %Y")
+                    except Exception as e:
+                        logging.error("Datetime failed")
+                        raise Exception(e)
 
-                    link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
-                    link = link_parsed['href']
+                    try:
+                        link_parsed = article.findNext(**{k: v for k, v in kwargs_link.items() if v is not None})
+                        link = link_parsed['href']
+                    except Exception as e:
+                        logging.error("Link failed")
+                        raise Exception(e)
 
                     a = Article(link=link, date=date,
                                 company_name=company_name, series=series, location=location,
@@ -303,6 +335,8 @@ def parse_funding(article):
                 return round(float(funding.replace(",","")) * 1000000)
             if article[i].lower() == 'b':
                 return round(float(funding.replace(",","")) * 1000000000)
+            if funding == '':
+                return None
             return round(float(funding.replace(",","")))
 
 def parse_series(article):
