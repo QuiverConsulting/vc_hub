@@ -194,6 +194,8 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 try:
                     try:
                         data = tokenize(article.text)  # Run article text through NER model
+                        if len(data) == 0:
+                            raise Exception("NER model failed to obtain any named entities.")
                     except Exception as e:
                         logging.error("Tokenization failed")
                         raise Exception(e)
