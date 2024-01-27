@@ -15,6 +15,8 @@ import re
 from dateutil import parser
 from datetime import datetime
 
+from requests import HTTPError
+
 load_dotenv()
 logging.basicConfig(level=logging.getLevelName(os.getenv('LOGGING_LEVEL')), format="[%(levelname)s | %(asctime)s | %(filename)s:%(lineno)s] : %(message)s", datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -270,11 +272,14 @@ def tokenize(article):
     def query(payload):
         try:
             response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
-            return response.json()
+            if response.ok:
+                return response.json()
+            else:
+                raise Exception(f"Model did not return ok response: {response.status_code}, {response.text}")
         except requests.exceptions.Timeout as e:
             logging.error(f"Model api request timed out: {e}")
             raise Exception(e)
-        except Exception as e:
+        except HTTPError as e:
             logging.error(f"Model api request error: {e}")
             raise Exception(e)
 
