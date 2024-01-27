@@ -186,6 +186,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
     kwargs_link = dict(name='a', class_=link_class)
 
     articles_parsed = soup.find_all(**{k: v for k, v in kwargs_article.items() if v is not None})
+    data = None
     for article in articles_parsed:
         for character in article.text:
             if character in currencies and any(keyWord in article.text.lower() for keyWord in keywords):  # Only parse articles that have currency in content
@@ -194,6 +195,8 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 try:
                     try:
                         data = tokenize(article.text)  # Run article text through NER model
+                        if not data:
+                            raise Exception("NER model failed to obtain any named entities.")
                     except Exception as e:
                         logging.error("Tokenization failed")
                         raise Exception(e)
@@ -248,6 +251,7 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                 except Exception as e:
                     logging.error(e)
                     logging.error(f"The following article caused an error: {article.text}")
+                    logging.error(f"The tokenizer returned the following {data}")
                 break  # Prevent re-running for every character in for loop if ran once
 
 
