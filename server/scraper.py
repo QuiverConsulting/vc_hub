@@ -264,8 +264,15 @@ def tokenize(article):
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
     def query(payload):
-        response = requests.post(API_URL, headers=headers, json=payload)
-        return response.json()
+        try:
+            response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+            return response.json()
+        except requests.exceptions.Timeout as e:
+            logging.error(f"Model api request timed out: {e}")
+            raise Exception(e)
+        except Exception as e:
+            logging.error(f"Model api request error: {e}")
+            raise Exception(e)
 
     data = query(article)
 
