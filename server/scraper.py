@@ -280,7 +280,7 @@ def tokenize(article):
         except requests.exceptions.Timeout as e:
             logging.error(f"Model api request timed out: {e}")
             raise Exception(e)
-        except HTTPError as e:
+        except Exception as e:
             logging.error(f"Model api request error: {e}")
             raise Exception(e)
 
