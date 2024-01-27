@@ -200,32 +200,32 @@ def parse_articles(soup, article_tag, article_class=None, date_tag=None, date_cl
                         if not data:
                             raise Exception("NER model failed to obtain any named entities.")
                     except Exception as e:
-                        logging.error("Tokenization failed")
+                        logging.error(f"Tokenization failed:{e}")
                         raise Exception(e)
                     try:
                         company_name = parse_orgs(data)  # Get company name
                     except Exception as e:
-                        logging.error("Company name failed")
+                        logging.error(f"Company name failed: {e}")
                         raise Exception(e)
                     try:
                         location = parse_location(data)  # Get location
                     except Exception as e:
-                        logging.error("Location failed")
+                        logging.error(f"Location failed: {e}")
                         raise Exception(e)
                     try:
                         financiers = parse_financiers(data)  # Get list of financiers
                     except Exception as e:
-                        logging.error("Financiers failed")
+                        logging.error(f"Financiers failed: {e}")
                         raise Exception(e)
                     try:
                         funding = parse_funding(article.text)
                     except Exception as e:
-                        logging.error("Funding failed")
+                        logging.error(f"Funding failed: {e}")
                         raise Exception(e)
                     try:
                         series = parse_series((article.text.lower()))
                     except Exception as e:
-                        logging.error("Series failed")
+                        logging.error(f"Series failed: {e}")
                         raise Exception(e)
 
                     try:
@@ -275,6 +275,7 @@ def tokenize(article):
             if response.ok:
                 return response.json()
             else:
+                logging.error(f"Model did not return ok response: {response.status_code}, {response.text}")
                 raise Exception(f"Model did not return ok response: {response.status_code}, {response.text}")
         except requests.exceptions.Timeout as e:
             logging.error(f"Model api request timed out: {e}")
