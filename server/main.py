@@ -42,6 +42,11 @@ def populateDb():
 async def root():
     return "Container woken up successfully"
 
+@app.get("/scrape", include_in_schema=False)
+async def root():
+    populateDb()
+    return "Scraping started"
+
 
 @app.on_event("startup")
 async def schedule_periodic():

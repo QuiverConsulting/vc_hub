@@ -14,6 +14,7 @@ import urllib.parse
 import re
 from dateutil import parser
 from datetime import datetime
+from requests.adapters import HTTPAdapter, Retry
 
 from requests import HTTPError
 
@@ -271,7 +272,15 @@ def tokenize(article):
 
     def query(payload):
         try:
-            response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+            s = requests.Session()
+
+            retries = Retry(total=5,
+                            backoff_factor=5,
+                            status_forcelist=[500, 502, 503, 504]) # sleep time = backoff factor * (2 ** ({number of previous retries}))
+
+            s.mount('http://', HTTPAdapter(max_retries=retries))
+
+            response = s.post(API_URL, headers=headers, json=payload)
             if response.ok:
                 return response.json()
             else:
