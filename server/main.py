@@ -45,7 +45,7 @@ async def root():
 @app.get("/scrape", include_in_schema=False)
 async def root():
     populateDb()
-    return "Scraping started"
+    return "Scraping finshed"
 
 
 @app.on_event("startup")
