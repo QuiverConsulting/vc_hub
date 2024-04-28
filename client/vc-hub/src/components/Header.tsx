@@ -10,7 +10,7 @@ const HeaderWrapper = styled("div")(
   flex-direction: row;
   align-items: center;
   justify-content: left;
-  margin:0 0;
+  margin-left: 35px;
 
   .toggle{
     right: 0;
@@ -74,9 +74,9 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
   return (
     <>
-      <AppBar position="static" color="transparent" elevation={0}>
+      <AppBar position="fixed" elevation={0} sx = {{ background: '#fdfaf9' }}>
         <HeaderWrapper>
-        <img src={VCHLogo} alt="VCH Logo" width="200" height="100"/>
+        <img src={VCHLogo} alt="VCH Logo" width="120" height="100"  style={{opacity:'100!important'}}/>
           {/* <MaterialUISwitch
             {...label}
             className="toggle"

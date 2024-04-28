@@ -43,7 +43,28 @@ const lightTheme = createTheme({
 });
 
 const Content = styled("div")(({ theme }) => ({
-  margin: "3rem",
+
+  margin: "10rem 0 3rem 3rem",
+}));
+
+const MissionStatement = styled("div")(({ theme }) => ({
+  margin: "0 0 3rem 3rem",
+  ".bold":{
+    fontSize: '65px',
+    justifyContent: 'center',
+    margin: "0rem 2rem",
+    width: '80vw',
+    textAlign: "center"
+  },
+  ".normal":{
+    fontSize: '20px',
+    justifyContent: 'center',
+    margin: "0rem 2rem",
+    width: '80vw',
+    textAlign: "center",
+    fontWeight: 'normal'
+  },
+
 }));
 
 const Main = () => {
@@ -61,7 +82,16 @@ const Main = () => {
       <CssBaseline />
       <Header setIsLightTheme={setIsLightTheme} isLightTheme={isLightTheme}/>
       <Content>
-        <Table />
+      <MissionStatement>
+        <p className="bold">
+        Empowering careers by connecting<br /> you with the latest innovations
+        </p>
+        <p className="normal">
+          Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub
+        </p>
+      
+      </MissionStatement>
+      <Table />
       </Content>
     </ThemeProvider>
   );
