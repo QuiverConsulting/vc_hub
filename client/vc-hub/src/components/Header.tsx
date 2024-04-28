@@ -2,14 +2,14 @@ import { AppBar, Switch, styled } from "@mui/material";
 import moon from "./../assets/moon.png";
 import sun from "./../assets/sun.png";
 import { Dispatch, FC, SetStateAction } from "react";
+import VCHLogo from '../assets/vch_logo.svg';
 
 const HeaderWrapper = styled("div")(
   ({ theme }) => `
-  color: ${theme.palette.primary.light};
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   margin:0 0;
 
   .toggle{
@@ -74,17 +74,17 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" color="transparent" elevation={0}>
         <HeaderWrapper>
-          <h2>VC HUB</h2>
-          <MaterialUISwitch
+        <img src={VCHLogo} alt="VCH Logo" width="200" height="100"/>
+          {/* <MaterialUISwitch
             {...label}
             className="toggle"
             defaultChecked={!isLightTheme}
             onClick={() => {
               setIsLightTheme((prev) => !prev);
             }}
-          />
+          /> */}
         </HeaderWrapper>
       </AppBar>
     </>

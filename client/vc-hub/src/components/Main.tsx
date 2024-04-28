@@ -3,6 +3,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Table from "./table/Table";
 import Header from "./Header";
 import { useEffect, useState } from "react";
+import background from '../assets/background.png';
+
 
 const darkTheme = createTheme({
   palette: {
@@ -28,6 +30,15 @@ const lightTheme = createTheme({
       secondary: '#d8e3ee'
     }
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundImage: `url(${background})`
+      }
+    }
+  }
+}
   
 });
 

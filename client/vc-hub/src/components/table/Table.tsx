@@ -81,21 +81,22 @@ const Table = () => {
     enableFacetedValues: true,
     enableMultiSort: true,
     isMultiSortEvent: () => true,
-    muiTableBodyProps: {
-      sx: (theme) => ({
+    // muiTableBodyProps: {
+    //   sx: (theme) => ({
      
-        '& tr:nth-of-type(odd) > td': {
-          backgroundColor: theme.palette.text.secondary,
-        },
-        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]):hover > td': {
-          backgroundColor: darken(theme.palette.text.secondary, 0.2),
-        },
-      }),
-    },
+    //     '& tr:nth-of-type(odd) > td': {
+    //       backgroundColor: theme.palette.text.secondary,
+    //     },
+    //     '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]):hover > td': {
+    //       backgroundColor: darken(theme.palette.text.secondary, 0.2),
+    //     },
+    //   }),
+    // },
 
     mrtTheme: (theme) => ({
       baseBackgroundColor: theme.palette.primary.contrastText,
     }),
+    
     muiRowDragHandleProps: ({ table }) => ({
       onDragEnd: () => {
         const { draggingRow, hoveredRow } = table.getState();
