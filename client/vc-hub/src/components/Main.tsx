@@ -87,7 +87,7 @@ const Main = () => {
         Empowering careers by connecting<br /> you with the latest innovations
         </p>
         <p className="normal">
-          Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub
+          Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub.
         </p>
       
       </MissionStatement>
