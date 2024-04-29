@@ -43,11 +43,11 @@ const lightTheme = createTheme({
 });
 
 const Content = styled("div")(({ theme }) => ({
-  margin: "10rem 3rem 3rem 3rem",
+  margin: "35vh 5vw 10vh 5vw",
 }));
 
-const MissionStatement = styled("div")(({ theme }) => ({
-  margin: "0 0 2rem 3rem",
+const MissionStatementWrapper = styled("div")(({ theme }) => ({
+  margin: "2rem 3rem 2rem 3rem",
   ".bold":{
     fontSize: '65px',
     justifyContent: 'center',
@@ -85,17 +85,23 @@ const Arrow = styled('div')`
   border-left: 20px solid transparent;
   border-right: 20px solid transparent;
   border-top: 30px solid #333;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   animation: ${bounceAnimation} 1s infinite;
   cursor: pointer;
 `;
 
 // Wrapper component to center the arrow
-const Wrapper = styled('div')`
+const ArrowWrapper = styled('div')`
+  margin: 30vh 43vw;
   justify-content: center;
   align-items: center;
-  margin-bottom: 5rem;
+  margin-bottom: 10vh;
 `;
+
+const FirstWrapper = styled("div")(({ theme }) => ({
+  width: '100vw',
+  height: '70vh'
+}));
 
 const Main = () => {
   const localIsLightTheme = localStorage.getItem("isLightTheme")
@@ -121,19 +127,21 @@ const Main = () => {
       <CssBaseline />
       <Header setIsLightTheme={setIsLightTheme} isLightTheme={isLightTheme}/>
       <Content>
-        <MissionStatement>
+        <FirstWrapper>
+        <MissionStatementWrapper>
           <p className="bold">
             Empowering careers by connecting<br /> you with the latest innovations
           </p>
           <p className="normal">
             Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub.
           </p>
-        </MissionStatement>
-        <Wrapper>
+        </MissionStatementWrapper>
+        <ArrowWrapper>
           <ScrollLink to="table" spy={true} smooth={true} duration={500}>
             <Arrow onClick={scrollToTable} />
           </ScrollLink>
-        </Wrapper>
+        </ArrowWrapper>
+        </FirstWrapper>
         <div ref={tableRef}>
           <Table />
         </div>

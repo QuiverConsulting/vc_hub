@@ -10,7 +10,7 @@ const HeaderWrapper = styled("div")(
   flex-direction: row;
   align-items: center;
   justify-content: left;
-  margin-left: 30px;
+  margin-left: 4.5vw;
 
   .toggle{
     right: 0;
