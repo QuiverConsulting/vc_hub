@@ -74,9 +74,9 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
   return (
     <>
-      <AppBar position="fixed" elevation={0} sx = {{ background: '#fdfaf9' }}>
+      <AppBar position="fixed" elevation={0} sx = {{ background: '#fdfaf9', height:'10vh', alignContent:'center' } }>
         <HeaderWrapper>
-        <img src={VCHLogo} alt="VCH Logo" width="120" height="80"  style={{opacity:'100!important'}}/>
+        <img src={VCHLogo} alt="VCH Logo" width="120" height="100vh" />
           {/* <MaterialUISwitch
             {...label}
             className="toggle"
