@@ -1,4 +1,6 @@
 import styled, { keyframes } from "styled-components";
+import downArrowImage from '../assets/arrow-down.png';
+
 
 const bounceAnimation = keyframes`
   0% {
@@ -12,13 +14,12 @@ const bounceAnimation = keyframes`
   }
 `;
 
-
-export const BouncyDownArrow = styled('div')`
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 30px solid #333;
+export const BouncyDownArrow  = styled('div')`
+    width: 40px; 
+    height: 40px; 
+    background-image: url(${downArrowImage});
+    background-size: cover;
+    background-repeat: no-repeat;
     animation: ${bounceAnimation} 1s infinite;
     cursor: pointer;
 `;
