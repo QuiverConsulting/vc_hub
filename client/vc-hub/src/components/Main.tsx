@@ -44,7 +44,7 @@ const lightTheme = createTheme({
 });
 
 const TableWrapper = styled("div")(({ theme }) => ({
-  margin: "10vh 5vw",
+  margin: "10vh 5vw 5vh 5vw",
   height: '80vh',
   alignContent: 'center'
 }));
