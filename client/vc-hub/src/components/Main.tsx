@@ -43,25 +43,22 @@ const lightTheme = createTheme({
 });
 
 const Content = styled("div")(({ theme }) => ({
-  margin: "35vh 5vw 10vh 5vw",
+  margin: "20vh 5vw 10vh 5vw",
 }));
 
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   margin: "2rem 3rem 2rem 3rem",
+  width: '80vw',
+  textAlign: "center",
+  justifyContent: 'center',
   ".bold":{
     fontSize: '65px',
-    justifyContent: 'center',
-    margin: "0rem 2rem",
-    width: '80vw',
-    textAlign: "center"
+    // margin: "0rem 2rem",
   },
   ".normal":{
     fontSize: '20px',
-    justifyContent: 'center',
-    margin: "0rem 2rem",
-    width: '80vw',
-    textAlign: "center",
-    fontWeight: 'normal'
+   
+    // margin: "0rem 2rem",
   },
 }));
 
@@ -92,15 +89,15 @@ const Arrow = styled('div')`
 
 // Wrapper component to center the arrow
 const ArrowWrapper = styled('div')`
-  margin: 30vh 43vw;
+  margin: 10vh 43vw;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10vh;
+  margin-bottom: 5vh;
 `;
 
 const FirstWrapper = styled("div")(({ theme }) => ({
   width: '100vw',
-  height: '70vh'
+  height: '80vh'
 }));
 
 const Main = () => {

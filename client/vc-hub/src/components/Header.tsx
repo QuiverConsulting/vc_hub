@@ -76,7 +76,7 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
     <>
       <AppBar position="fixed" elevation={0} sx = {{ background: '#fdfaf9' }}>
         <HeaderWrapper>
-        <img src={VCHLogo} alt="VCH Logo" width="120" height="100"  style={{opacity:'100!important'}}/>
+        <img src={VCHLogo} alt="VCH Logo" width="120" height="80"  style={{opacity:'100!important'}}/>
           {/* <MaterialUISwitch
             {...label}
             className="toggle"
