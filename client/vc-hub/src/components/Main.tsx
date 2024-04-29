@@ -1,47 +1,13 @@
-import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
+import { ThemeProvider, styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Table from "./table/Table";
 import Header from "./Header";
 import { useEffect, useState, useRef } from "react";
-import background from '../assets/background.png';
+
 import { Link as ScrollLink } from 'react-scroll';
 import { BouncyDownArrow } from "./BouncyDownArrow";
+import { lightTheme, darkTheme } from "../Themes";
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: '#e3f2fd',
-      contrastText: '#131111',
-    },
-    background:{
-      default: '#0a0a0a'
-    },
-    text:{
-      primary:'#e3f2fd',
-      secondary: '#424242'
-    }
-  },
-});
-
-const lightTheme = createTheme({
-  palette: {
-    mode: "light",
-    text:{
-      secondary: '#d8e3ee'
-    }
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          backgroundImage: `url(${background})`
-      }
-    }
-  }
-}
-  
-});
 
 const TableWrapper = styled("div")(({ theme }) => ({
   margin: "10vh 5vw 5vh 5vw",

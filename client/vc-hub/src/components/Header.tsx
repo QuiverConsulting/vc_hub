@@ -1,7 +1,7 @@
 import { AppBar, Switch, styled } from "@mui/material";
 import moon from "./../assets/moon.png";
 import sun from "./../assets/sun.png";
-import { Dispatch, FC, SetStateAction } from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import VCHLogo from '../assets/vch_logo.svg';
 
 const HeaderWrapper = styled("div")(
@@ -71,10 +71,26 @@ interface Props {
 }
 
 const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
+  const [isAtTop, setIsAtTop] = useState(true);
+
   const label = { inputProps: { "aria-label": "Toggle Dark Mode" } };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isTop = window.scrollY === 0;
+      setIsAtTop(isTop);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <AppBar position="fixed" elevation={0} sx = {{ background: '#fdfaf9', height:'10vh',  justifyContent:'center' } }>
+      <AppBar position="fixed" elevation={0} color={isAtTop ? "transparent" : "secondary"} sx = {{  height:'10vh',  justifyContent:'center' } }>
         <HeaderWrapper>
         <img src={VCHLogo} alt="VCH Logo" width="120"  />
           {/* <MaterialUISwitch
