@@ -1,10 +1,11 @@
-import { ThemeProvider, createTheme, keyframes, styled } from "@mui/material/styles";
+import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Table from "./table/Table";
 import Header from "./Header";
 import { useEffect, useState, useRef } from "react";
 import background from '../assets/background.png';
 import { Link as ScrollLink } from 'react-scroll';
+import { BouncyDownArrow } from "./BouncyDownArrow";
 
 const darkTheme = createTheme({
   palette: {
@@ -56,32 +57,14 @@ const MissionStatementWrapper = styled("div")(({ theme }) => ({
   },
 }));
 
-// Keyframe animation for bouncing
-const bounceAnimation = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(8px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-`;
 
-const Arrow = styled('div')`
+const ArrowWrapper = styled('div')`
   position: absolute;
   bottom: 3vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-top: 30px solid #333;
-  animation: ${bounceAnimation} 1s infinite;
-  cursor: pointer;
 `;
+
 
 const ContentWrapper = styled("div")(({ theme }) => ({
   display: 'flex',
@@ -126,7 +109,9 @@ const Main = () => {
           </p>
         </MissionStatementWrapper>
           <ScrollLink to="table" spy={true} smooth={true} duration={500} className="arrow">
-            <Arrow onClick={scrollToTable} />
+            <ArrowWrapper>
+            <BouncyDownArrow onClick={scrollToTable} />
+            </ArrowWrapper>
           </ScrollLink>
         </ContentWrapper>
         <TableWrapper ref={tableRef}>
