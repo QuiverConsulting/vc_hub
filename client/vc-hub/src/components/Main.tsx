@@ -42,23 +42,17 @@ const lightTheme = createTheme({
   
 });
 
-const Content = styled("div")(({ theme }) => ({
-  margin: "20vh 5vw 10vh 5vw",
+const TableWrapper = styled("div")(({ theme }) => ({
+  margin: "10vh 5vw",
 }));
 
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
-  margin: "2rem 3rem 2rem 3rem",
-  width: '80vw',
-  textAlign: "center",
-  justifyContent: 'center',
+  textAlign: 'center',
   ".bold":{
-    fontSize: '65px',
-    // margin: "0rem 2rem",
+    fontSize: '65px'
   },
   ".normal":{
-    fontSize: '20px',
-   
-    // margin: "0rem 2rem",
+    fontSize: '20px'
   },
 }));
 
@@ -75,29 +69,27 @@ const bounceAnimation = keyframes`
   }
 `;
 
-// Styled component for the arrow
 const Arrow = styled('div')`
+  position: absolute;
+  bottom: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 20px solid transparent;
   border-right: 20px solid transparent;
   border-top: 30px solid #333;
-  /* margin: 0 auto; */
   animation: ${bounceAnimation} 1s infinite;
   cursor: pointer;
 `;
 
-// Wrapper component to center the arrow
-const ArrowWrapper = styled('div')`
-  margin: 10vh 43vw;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 5vh;
-`;
+const ContentWrapper = styled("div")(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  height: '95vh'
 
-const FirstWrapper = styled("div")(({ theme }) => ({
-  width: '100vw',
-  height: '80vh'
 }));
 
 const Main = () => {
@@ -123,8 +115,8 @@ const Main = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Header setIsLightTheme={setIsLightTheme} isLightTheme={isLightTheme}/>
-      <Content>
-        <FirstWrapper>
+     
+        <ContentWrapper>
         <MissionStatementWrapper>
           <p className="bold">
             Empowering careers by connecting<br /> you with the latest innovations
@@ -133,16 +125,13 @@ const Main = () => {
             Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub.
           </p>
         </MissionStatementWrapper>
-        <ArrowWrapper>
-          <ScrollLink to="table" spy={true} smooth={true} duration={500}>
+          <ScrollLink to="table" spy={true} smooth={true} duration={500} className="arrow">
             <Arrow onClick={scrollToTable} />
           </ScrollLink>
-        </ArrowWrapper>
-        </FirstWrapper>
-        <div ref={tableRef}>
+        </ContentWrapper>
+        <TableWrapper ref={tableRef}>
           <Table />
-        </div>
-      </Content>
+      </TableWrapper>
     </ThemeProvider>
   );
 };
