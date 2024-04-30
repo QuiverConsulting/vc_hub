@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material";
 import background from './assets/background.png';
+import './assets/styles.css'
 
 export const darkTheme = createTheme({
     palette: {
@@ -28,7 +29,10 @@ export const darkTheme = createTheme({
         main: '#fdfaf9',
         dark: '#000000'
 
-      }
+      },
+    },
+    typography:{
+      fontFamily: "figtree, barlow"
     },
     components: {
       MuiCssBaseline: {

@@ -10,16 +10,19 @@ import styled from "styled-components";
 const TableWrapper = styled("div")(({ theme }) => ({
   margin: "10vh 5vw 5vh 5vw",
   height: '90vh',
-  alignContent: 'center'
+  alignContent: 'center',
+  fontFamily: 'barlow'
 }));
 
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
-    fontSize: 'calc(4vw + 20px)'
+    fontSize: 'calc(3.5vw + 10px)',
+    fontFamily: 'figtree'
   },
   ".normal":{
-    fontSize: 'calc(2vw + 10px)'
+    fontSize: 'calc(1.5vw + 8px)',
+    fontFamily: 'barlow'
   },
 }));
 
