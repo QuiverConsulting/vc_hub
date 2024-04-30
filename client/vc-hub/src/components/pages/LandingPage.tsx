@@ -8,7 +8,7 @@ import styled from "styled-components";
 
 
 const TableWrapper = styled("div")(({ theme }) => ({
-  margin: "15vh 5vw 5vh 5vw",
+  margin: "5vh 5vw 5vh 5vw",
   height: '90vh',
   alignContent: 'center'
 }));
@@ -16,17 +16,20 @@ const TableWrapper = styled("div")(({ theme }) => ({
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
-    fontSize: 'calc(3vw + 10px)'
+    fontSize: 'calc(3.5vw + 10px)'
   },
   ".normal":{
-    fontSize: 'calc(1vw + 7px)'
+    fontSize: 'calc(1.5vw + 8px)'
   },
+  "p":{
+    marginBottom:'0'
+  }
 }));
 
 
 const ArrowWrapper = styled('div')`
   position: absolute;
-  bottom: 3vh;
+  bottom: 37vh;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -37,7 +40,7 @@ const ContentWrapper = styled("div")(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'column',
   justifyContent: 'center',
-  height: '95vh'
+  height: '60vh'
 
 }));
 

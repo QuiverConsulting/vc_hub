@@ -7,7 +7,7 @@ import {
 import getVCData from "../../apis/getVCData";
 import { Article } from "../../Interfaces";
 import tableColumns from "./TableColumns";
-import { LinearProgress, darken, styled } from "@mui/material";
+import { LinearProgress, styled } from "@mui/material";
 import moment from "moment";
 
 const ProgressWrapper = styled("div")(
@@ -17,12 +17,11 @@ const ProgressWrapper = styled("div")(
 `
 );
 
-const DescriptionWrapper = styled("div")(
-  ({ theme }) => `
-  display:flex;
-  flex-direction: row;
-`
-);
+const DescriptionWrapper = styled("div")(({ theme }) => ({
+  textAlign: 'left',
+  fontSize: '1em'
+}));
+
 
 const Table = () => {
   const [articles, setArticles] = useState<Article[] | undefined>(undefined);
@@ -120,20 +119,23 @@ const Table = () => {
         </ProgressWrapper>
       ) : (
         <>
+      
+          <MaterialReactTable table={table} />
           <DescriptionWrapper>
-            <p>Daily updated list of VC funded companies.</p>
+          <p>
+            Daily updated list of VC funded companies.
             {expiryDate && (
-              <p>
-                &nbsp;Last Updated on{" "}
+              <>
+                {" "}Last Updated on{" "}
                 {moment(expiryDate)
                   .subtract(1, "days")
                   .local()
                   .format("dddd MMM DD YYYY")}
                 .
-              </p>
+              </>
             )}
-          </DescriptionWrapper>
-          <MaterialReactTable table={table} />
+          </p>
+        </DescriptionWrapper>
         </>
       )}
     </>
