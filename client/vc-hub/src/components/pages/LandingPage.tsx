@@ -8,7 +8,7 @@ import styled from "styled-components";
 
 
 const TableWrapper = styled("div")(({ theme }) => ({
-  margin: "5vh 5vw 5vh 5vw",
+  margin: "5vh 5vw 1vh 5vw",
   height: '90vh',
   alignContent: 'center'
 }));
