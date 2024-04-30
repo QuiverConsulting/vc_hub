@@ -11,7 +11,7 @@ const HeaderWrapper = styled("div")(
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0 5rem; 
+  padding: 0 4.4vw; 
   button{
     margin-right: 5rem;
   }
