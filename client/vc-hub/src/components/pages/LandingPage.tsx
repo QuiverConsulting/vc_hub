@@ -8,7 +8,7 @@ import styled from "styled-components";
 
 
 const TableWrapper = styled("div")(({ theme }) => ({
-  margin: "5vh 5vw 1vh 5vw",
+  margin: "10vh 5vw 1vh 5vw",
   height: '90vh',
   alignContent: 'center',
 
@@ -32,7 +32,7 @@ const MissionStatementWrapper = styled("div")(({ theme }) => ({
 
 const ArrowWrapper = styled('div')`
   position: absolute;
-  bottom: 35vh;
+  bottom: 25vh;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -43,7 +43,7 @@ const ContentWrapper = styled("div")(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'column',
   justifyContent: 'center',
-  height: '65vh'
+  height: '70vh'
 
 }));
 
