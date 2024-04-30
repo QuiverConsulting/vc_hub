@@ -11,14 +11,14 @@ const TableWrapper = styled("div")(({ theme }) => ({
   margin: "5vh 5vw 1vh 5vw",
   height: '90vh',
   alignContent: 'center',
-  fontFamily: 'barlow'
+
 }));
 
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
     fontSize: 'calc(3.5vw + 10px)',
-    fontFamily: 'figtree'
+
   },
   ".normal":{
     fontSize: 'calc(1.5vw + 8px)',
