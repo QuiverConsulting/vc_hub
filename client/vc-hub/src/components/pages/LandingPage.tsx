@@ -16,10 +16,10 @@ const TableWrapper = styled("div")(({ theme }) => ({
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
-    fontSize: 'calc(4vw + 20px)'
+    fontSize: 'calc(3vw + 10px)'
   },
   ".normal":{
-    fontSize: 'calc(2vw + 10px)'
+    fontSize: 'calc(1vw + 7px)'
   },
 }));
 
