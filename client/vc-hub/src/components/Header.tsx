@@ -101,12 +101,12 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
               setIsLightTheme((prev) => !prev);
             }}
           /> */}
-          <div>
+          {/* <div>
             <Link to="/about"> 
               <Button variant="text" >About</Button>
             </Link>
             <Button variant="contained" sx={{backgroundColor: 'common.black' }} >Buy us coffee</Button>
-          </div>
+          </div> */}
         </HeaderWrapper>
       </AppBar>
     </>

@@ -9,17 +9,17 @@ import styled from "styled-components";
 
 const TableWrapper = styled("div")(({ theme }) => ({
   margin: "10vh 5vw 5vh 5vw",
-  height: '80vh',
+  height: '90vh',
   alignContent: 'center'
 }));
 
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
-    fontSize: '65px'
+    fontSize: 'calc(4vw + 20px)'
   },
   ".normal":{
-    fontSize: '20px'
+    fontSize: 'calc(2vw + 10px)'
   },
 }));
 
