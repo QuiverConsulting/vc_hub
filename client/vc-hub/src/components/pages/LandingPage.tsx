@@ -24,7 +24,7 @@ const MissionStatementWrapper = styled("div")(({ theme }) => ({
 
   },
   ".normal":{
-    fontSize: 'calc(1vw + 8px)',
+    fontSize: 'calc(1.1vw + 9px)',
     lineHeight: '120%'
   }
 }));
