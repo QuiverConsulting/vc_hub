@@ -76,6 +76,7 @@ const Table = () => {
     enableFilterMatchHighlighting: true,
     enableFacetedValues: true,
     enableMultiSort: true,
+    enableFullScreenToggle: false,
     isMultiSortEvent: () => true,
     // muiTableBodyProps: {
     //   sx: (theme) => ({
@@ -91,8 +92,17 @@ const Table = () => {
 
     mrtTheme: (theme) => ({
       baseBackgroundColor: theme.palette.common.white,
+
     }),
-    
+
+    muiTablePaperProps: {
+      elevation: 0, //change the mui box shadow
+      //customize paper styles
+      sx: {
+        borderRadius: '0',
+        border: '1px solid  #e0e0e0',
+      },
+    },
     muiRowDragHandleProps: ({ table }) => ({
       onDragEnd: () => {
         const { draggingRow, hoveredRow } = table.getState();
