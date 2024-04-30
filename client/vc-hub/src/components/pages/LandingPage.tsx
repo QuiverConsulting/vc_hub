@@ -32,7 +32,7 @@ const MissionStatementWrapper = styled("div")(({ theme }) => ({
 
 const ArrowWrapper = styled('div')`
   position: absolute;
-  bottom: 40vh;
+  bottom: 25vh;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -43,7 +43,7 @@ const ContentWrapper = styled("div")(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'column',
   justifyContent: 'center',
-  height: '55vh'
+  height: '70vh'
 
 }));
 
@@ -67,12 +67,11 @@ const LandingPage = () => {
             Discover your next opportunity with companies <br /> fuelled by venture capital at VC Hub.
         </p>
     </MissionStatementWrapper>
-    <ArrowWrapper>
     <ScrollLink to="table" spy={true} smooth={true} duration={500} className="arrow">
-        
+        <ArrowWrapper>
             <BouncyDownArrow onClick={scrollToTable} />
+        </ArrowWrapper>
     </ScrollLink>
-    </ArrowWrapper>
     </ContentWrapper>
     <TableWrapper ref={tableRef}>
         <Table />
