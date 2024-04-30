@@ -26,6 +26,8 @@ export const darkTheme = createTheme({
       },
       secondary: {
         main: '#fdfaf9',
+        dark: '#000000'
+
       }
     },
     components: {

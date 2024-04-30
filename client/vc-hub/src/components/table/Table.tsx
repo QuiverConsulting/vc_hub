@@ -94,7 +94,7 @@ const Table = () => {
     // },
 
     mrtTheme: (theme) => ({
-      baseBackgroundColor: theme.palette.primary.contrastText,
+      baseBackgroundColor: theme.palette.common.white,
     }),
     
     muiRowDragHandleProps: ({ table }) => ({

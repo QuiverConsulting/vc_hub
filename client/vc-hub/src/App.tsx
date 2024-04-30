@@ -1,9 +1,12 @@
-import Main from "./components/Main";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './AppRoutes';
+import Main from './components/Main';
 
-function App() {
+const App: React.FC = () => {
   return (
-      <Main></Main>
+    <Main></Main>
   );
-}
+};
 
 export default App;

@@ -1,22 +1,20 @@
-import { AppBar, Switch, styled } from "@mui/material";
+import { AppBar, Button, Switch, styled } from "@mui/material";
 import moon from "./../assets/moon.png";
 import sun from "./../assets/sun.png";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import VCHLogo from '../assets/vch_logo.svg';
+import { Link } from "react-router-dom";
 
 const HeaderWrapper = styled("div")(
   ({ theme }) => `
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: left;
-  margin-left: 4.5vw;
-
-  .toggle{
-    right: 0;
-    position: absolute;
-    margin-right:2rem;
-  } 
+  justify-content: space-between;
+  padding: 0 5rem; 
+  button{
+    margin-right: 5rem;
+  }
 `
 );
 
@@ -92,15 +90,23 @@ const Header: FC<Props> = ({ setIsLightTheme, isLightTheme}) => {
     <>
       <AppBar position="fixed" elevation={0} color={isAtTop ? "transparent" : "secondary"} sx = {{  height:'10vh',  justifyContent:'center' } }>
         <HeaderWrapper>
+        <Link to="/"> 
         <img src={VCHLogo} alt="VCH Logo" width="120"  />
+        </Link>
           {/* <MaterialUISwitch
             {...label}
-            className="toggle"
+            className="right"
             defaultChecked={!isLightTheme}
             onClick={() => {
               setIsLightTheme((prev) => !prev);
             }}
           /> */}
+          <div>
+            <Link to="/about"> 
+              <Button variant="text" >About</Button>
+            </Link>
+            <Button variant="contained" sx={{backgroundColor: 'common.black' }} >Buy us coffee</Button>
+          </div>
         </HeaderWrapper>
       </AppBar>
     </>

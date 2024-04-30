@@ -3,7 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import { lightTheme, darkTheme } from "../Themes";
-import LandingPage from "./LandingPage";
+import AppRoutes from "../AppRoutes";
 
 
 const Main = () => {
@@ -21,7 +21,7 @@ const Main = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Header setIsLightTheme={setIsLightTheme} isLightTheme={isLightTheme}/>
-      <LandingPage />
+      <AppRoutes />
     </ThemeProvider>
   );
 };

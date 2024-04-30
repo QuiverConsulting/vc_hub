@@ -1,8 +1,8 @@
 
-import Table from "./table/Table";
+import Table from "../table/Table";
 import { useRef } from "react";
 import { Link as ScrollLink } from 'react-scroll';
-import { BouncyDownArrow } from "./BouncyDownArrow";
+import { BouncyDownArrow } from "../BouncyDownArrow";
 import styled from "styled-components";
 
 
