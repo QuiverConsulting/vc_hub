@@ -47,7 +47,7 @@ const tableColumns: MRT_ColumnDef<Article>[] = [
     accessorKey: "link",
     header: "Link",
     size: 150,
-    Cell: ({ cell }) => <a href={cell.getValue<string>()} target="_blank" rel="noopener noreferrer">{cell.getValue<string>()}</a>
+    Cell: ({ cell }) => <a href={cell.getValue<string>()} target="_blank" rel="noopener noreferrer">{cell.getValue<string>().slice(0,40).concat("...")}</a>
   },
 ];
 
