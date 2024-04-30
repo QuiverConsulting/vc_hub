@@ -32,7 +32,7 @@ export const darkTheme = createTheme({
       },
     },
     typography:{
-      fontFamily: "figtree, barlow"
+      fontFamily: "barlow, figtree"
     },
     components: {
       MuiCssBaseline: {

@@ -19,7 +19,7 @@ const ProgressWrapper = styled("div")(
 
 const DescriptionWrapper = styled("div")(({ theme }) => ({
   textAlign: 'left',
-  fontSize: '1em'
+  fontSize: '1rem'
 }));
 
 

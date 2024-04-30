@@ -17,22 +17,22 @@ const TableWrapper = styled("div")(({ theme }) => ({
 const MissionStatementWrapper = styled("div")(({ theme }) => ({
   textAlign: 'center',
   ".bold":{
-    fontSize: 'calc(3.5vw + 10px)',
+    fontSize: 'calc(2.7vw + 10px)',
+    fontFamily: 'figtree',
+    fontWeight: '600',
+    lineHeight: '120%'
 
   },
   ".normal":{
-    fontSize: 'calc(1.5vw + 8px)',
-    fontFamily: 'barlow'
-  },
-  "p":{
-    marginBottom:'0'
+    fontSize: 'calc(1vw + 8px)',
+    lineHeight: '120%'
   }
 }));
 
 
 const ArrowWrapper = styled('div')`
   position: absolute;
-  bottom: 25vh;
+  bottom: 30vh;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -43,7 +43,7 @@ const ContentWrapper = styled("div")(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'column',
   justifyContent: 'center',
-  height: '70vh'
+  height: '65vh'
 
 }));
 
