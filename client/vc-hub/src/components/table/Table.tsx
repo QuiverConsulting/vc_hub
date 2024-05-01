@@ -68,6 +68,7 @@ const Table = () => {
     initialState: {
       density: "compact",
       pagination: { pageSize: 25, pageIndex: 0 },
+      columnPinning: { left: ['company_name'] } 
     },
     muiTableContainerProps: { sx: { maxHeight: "63vh" } },
     enableStickyHeader: true,
@@ -77,6 +78,7 @@ const Table = () => {
     enableFacetedValues: true,
     enableMultiSort: true,
     enableFullScreenToggle: false,
+    enableColumnPinning: true,
     isMultiSortEvent: () => true,
     // muiTableBodyProps: {
     //   sx: (theme) => ({
@@ -96,8 +98,7 @@ const Table = () => {
     }),
 
     muiTablePaperProps: {
-      elevation: 0, //change the mui box shadow
-      //customize paper styles
+      elevation: 0,
       sx: {
         borderRadius: '0',
         border: '1px solid  #e0e0e0',
